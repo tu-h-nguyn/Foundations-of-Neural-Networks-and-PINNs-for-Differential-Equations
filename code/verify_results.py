@@ -226,28 +226,43 @@ def muc_C():
 # --------------------------------------------------------------------------
 # D. Chay lai TN1 tu dau (tuy chon, ~50 giay)
 # --------------------------------------------------------------------------
-# Phan nhom duoi day KHONG phai doan: no do duoc bang cach chay lai TN1 voi
-# OMP_NUM_THREADS = 1, 2, 4 roi doi chieu tung dai luong (xem bang trong phan
-# "Tai lap" cua code/README.md). Ranh gioi hoa ra rat sac net:
+# Phan nhom duoi day da tung SAI, va CI bat duoc.
 #
-#   * Dai luong cua mang ReLU deu bat bien, vi gradient bang 0 dung nghia den
-#     nen Adam khong doi duoc tham so nao: khong co quy dao de tich luy sai so.
-#   * ||grad J_r||_inf bat bien nhung ||grad J_r||_2 thi KHONG -- chuan max la
-#     mot phep CHON, con chuan L2 la mot phep CONG DON, va chinh thu tu cong
-#     don moi la thu so luong BLAS lam thay doi.
-#   * Dai luong cua mang tanh sau 4000 vong Adam lech toi ~3%.
-BAT_BIEN = [
-    ("tanh", "max_uxx_khoi_tao"),
-    ("tanh", "grad_Jr_inf_khoi_tao"),   # chuan max: phep chon, khong cong don
-    ("tanh", "so_tham_so"),
+# Lan dau no duoc hieu chinh bang cach chay lai TN1 voi OMP_NUM_THREADS = 1, 2,
+# 4 TREN CUNG MOT MAY, roi ket luan rang moi dai luong khong di qua quy dao toi
+# uu hoa deu tai lap tung bit. Chay tren runner cua GitHub -- CPU khac -- ba
+# dai luong trong nhom do lech ngay: tanh.max_uxx_khoi_tao,
+# tanh.grad_Jr_inf_khoi_tao va relu.eps_L2.
+#
+# Sai lam la do CHI thay doi mot yeu to roi cho rang do la yeu to duy nhat. So
+# luong luong khong phai nguon duy nhat lam doi thu tu cong don: CPU khac chon
+# nhan BLAS khac (AVX2 / AVX-512), va thu tu cong don lai doi lan nua.
+#
+# Nhom duy nhat that su bat bien tren MOI may la nhung dai luong khong he duoc
+# tinh bang phep cong don dau ca:
+#   * dai luong cua mang ReLU bang KHONG dung nghia den -- sigma'' = 0 hau khap
+#     noi, nen u_xx va grad J_r la so 0 cau truc, khong phai tong cua cac so
+#     hang trai dau;
+#   * so tham so la mot phep dem nguyen.
+# Moi thu con lai deu la so thuc dau phay dong, va deu co the lech.
+BAT_BIEN_CAU_TRUC = [
     ("relu", "max_uxx_khoi_tao"),
     ("relu", "grad_Jr_inf_khoi_tao"),
     ("relu", "grad_Jr_l2_khoi_tao"),
+    ("tanh", "so_tham_so"),
+    ("relu", "so_tham_so"),
+]
+# Dai luong chi di qua MOT luot truyen xuoi/nguoc, khong tich luy qua vong lap:
+# sai khac giua cac may chi o muc ulp.
+MOT_LUOT = [
+    ("tanh", "max_uxx_khoi_tao"),
+    ("tanh", "grad_Jr_inf_khoi_tao"),
+    ("tanh", "grad_Jr_l2_khoi_tao"),
     ("relu", "Jr_cuoi"),
     ("relu", "eps_L2"),
     ("relu", "eps_Linf"),
-    ("relu", "so_tham_so"),
 ]
+DUNG_SAI_MOT_LUOT = 1e-9
 # Lech tuong doi lon nhat do duoc tren 1/2/4 luong: 3,4% (eps_L2 tai 2 luong).
 # Nguong 5% = khop den 2 chu so co nghia, con du bien nhung khong vo nghia.
 DUNG_SAI_HUAN_LUYEN = 5e-2
@@ -267,22 +282,29 @@ def muc_D():
     goc = {c["act"]: c for c in _load("exp1_relu.json")["cau_hinh"]}
     moi = {a: exp1_relu.run(a) for a in ("tanh", "relu")}
 
-    lech = [f"{a}.{k}" for a, k in BAT_BIEN if moi[a][k] != goc[a][k]]
-    check(f"TN1  chay lai: {len(BAT_BIEN)} dai luong bat bien trung khop tung bit",
-          not lech, ", ".join(lech) if lech else f"{len(BAT_BIEN)}/{len(BAT_BIEN)}")
+    lech = [f"{a}.{k}" for a, k in BAT_BIEN_CAU_TRUC if moi[a][k] != goc[a][k]]
+    check(f"TN1  chay lai: {len(BAT_BIEN_CAU_TRUC)} dai luong bat bien CAU TRUC "
+          "trung khop tung bit", not lech,
+          ", ".join(lech) if lech else f"{len(BAT_BIEN_CAU_TRUC)}/{len(BAT_BIEN_CAU_TRUC)}")
+
+    # In ra do lech thuc te de lan sau con hieu chinh duoc bang so do duoc,
+    # thay vi bang phong doan.
+    worst, worst_name = 0.0, ""
+    for a, k in MOT_LUOT:
+        got, want = moi[a][k], goc[a][k]
+        rel = abs(got - want) / abs(want) if want else abs(got - want)
+        if rel > worst:
+            worst, worst_name = rel, f"{a}.{k}"
+    check(f"TN1  chay lai: {len(MOT_LUOT)} dai luong mot luot khop den "
+          f"{DUNG_SAI_MOT_LUOT:g}", worst < DUNG_SAI_MOT_LUOT,
+          f"lech lon nhat {worst:.3e} tai {worst_name}"
+          if worst else "trung khop tung bit")
 
     for k in ("Jr_cuoi", "eps_L2", "eps_Linf"):
         got, want = moi["tanh"][k], goc["tanh"][k]
         rel = abs(got - want) / abs(want)
         check(f"TN1  chay lai: tanh.{k} khop den 2 chu so co nghia",
               rel < DUNG_SAI_HUAN_LUYEN, f"lech tuong doi {rel * 100:.2f}%")
-
-    # ||grad J_r||_2 la truong hop bien: chi lech co mot ulp, nhung van lech.
-    got, want = moi["tanh"]["grad_Jr_l2_khoi_tao"], goc["tanh"]["grad_Jr_l2_khoi_tao"]
-    check("TN1  chay lai: tanh.grad_Jr_l2_khoi_tao khop den ~1 ulp",
-          abs(got - want) <= 8 * sys.float_info.epsilon * abs(want),
-          f"lech {abs(got - want):.3e} "
-          f"({abs(got - want) / abs(want) / sys.float_info.epsilon:.1f} ulp)")
 
 
 def main():

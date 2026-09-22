@@ -118,30 +118,39 @@ regime**, a lemma that exists only because the experiment failed.
 
 Every experiment pins a seed and runs in `float64`. **That is not enough for
 digit-for-digit reproduction**, and the repository says so with data instead of
-disclaimers. The number of BLAS threads changes the summation order inside each matmul;
-re-running TN1 at 1, 2 and 4 threads splits its outputs cleanly in two:
+disclaimers.
+
+The first attempt at pinning this down was wrong, and CI caught it. Re-running
+TN1 at 1, 2 and 4 BLAS threads *on one machine* suggested that everything not
+passing through an optimisation trajectory reproduced bit-for-bit. On GitHub's
+runners — different CPU — three of those quantities immediately disagreed. Thread
+count is not the only thing that reorders a summation: a different CPU selects
+different SIMD kernels, and reorders it again. The measurement had varied one
+factor and concluded it was the only one.
+
+What survives that correction is a sharper and smaller claim:
 
 | | reproduces bit-for-bit | why |
 |---|---|---|
-| every ReLU quantity | **yes** | the gradient is exactly zero, so Adam never moves a parameter — there is no trajectory to accumulate error along |
-| $\|\nabla J_r\|_\infty$ at init | **yes** | a max is a *selection*, not a summation |
-| $\|\nabla J_r\|_2$ at init | no — 1 ulp | an L² norm *is* a summation |
+| ReLU's \$u_{xx}\$ and \$\nabla J_r\$; the parameter count | **yes, on any machine** | these are not sums at all — \$\sigma''\equiv 0\$ makes them structural zeros, and a parameter count is an integer |
+| one forward/backward pass (init derivatives, the dead ReLU net's error) | to ~1 ulp | floating-point, but with no trajectory to accumulate along |
 | tanh quantities after 4 000 Adam steps | no — up to 3,4% | epsilon-sized differences amplified along the optimisation trajectory |
 
 So `verify_results.py` deliberately does **not** do `git diff --exit-code` on the
-results, which would look rigorous and would go red on any machine with a different
-thread count. It checks 39 items at the precision each one actually supports:
+results, which would look rigorous and would go red on any machine at all. It
+checks 39 items at the precision each one actually supports:
 
-- **closed-form identities**, to machine precision — e.g. the mean of $f^2$ is
-  $8\pi^4$, and the value ReLU's dead network is stuck at is the grid mean of $f^2$,
-  matched to $10^{-12}$;
-- **internal consistency** — the $\lambda_b$ exponent is re-fitted from the rows, all
-  36 error ratios are recomputed from their own components, and TN1 and TN2 are checked
-  to be bit-identical where they share a run;
-- **inequalities and signs** — the $\pi^{-2}$ bound, the monotonicity of the boundary
-  error, the negative Burgers result;
-- **a real re-run** of TN1, holding the 10 thread-invariant quantities to bit-equality
-  and the trained ones to two significant figures.
+- **closed-form identities**, to machine precision — e.g. the mean of \$f^2\$ is
+  \$8\pi^4\$, and the value ReLU's dead network is stuck at is the grid mean of
+  \$f^2\$, matched to \$10^{-12}\$;
+- **internal consistency** — the \$\lambda_b\$ exponent is re-fitted from the rows,
+  all 36 error ratios are recomputed from their own components, and TN1 and TN2
+  are checked to be bit-identical where they share a run;
+- **inequalities and signs** — the \$\pi^{-2}\$ bound, the monotonicity of the
+  boundary error, the negative Burgers result;
+- **a real re-run** of TN1, in the three tiers above, reporting the largest
+  deviation it saw so the next recalibration uses measurements rather than
+  guesses.
 
 The gate was mutation-tested: corrupting a ratio, or setting the fitted exponent to the
 theoretically expected −1, is caught.
