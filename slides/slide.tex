@@ -19,6 +19,12 @@
 \usepackage{amsmath,amssymb,bm}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{animate}   % animation nhung trong PDF (Adobe Reader, Okular, Foxit)
+
+% Animation lay tu anim/<ten>.pdf -- moi trang mot khung, sinh boi
+% code/pinns/animate.py. Trong trinh xem khong ho tro, hien khung dau.
+\newcommand{\hoathinh}[2][0.62\textheight]{%
+  \animategraphics[height=#1,controls=play,loop,autoplay]{10}{anim/#2}{}{}}
 
 %--------------------- KY HIEU DUNG CHUNG ---------------------
 \newcommand{\R}{\mathbb{R}}
@@ -139,6 +145,17 @@ $J_r = 776{,}23$ so với giá trị lý thuyết $778{,}49$.
 \end{frame}
 
 %==============================================================
+\begin{frame}{Xem nó xảy ra: ReLU đứng yên, tanh hội tụ}
+\centering
+\hoathinh{tn1_relu_vs_tanh}
+
+\medskip
+\footnotesize Đường cam nằm yên ở $J_r = 776{,}23$ suốt $4\,000$ vòng ---
+đúng giá trị Hệ quả 2.28 tiên đoán. \textcolor{gray}{(Animation phát trong
+Adobe Reader / Okular.)}
+\end{frame}
+
+%==============================================================
 \begin{frame}{Câu hỏi 1: vì sao cực tiểu hoá phần dư là đáng làm}
 \begin{block}{Chặn ổn định (Mệnh đề 4.3) --- bài toán Poisson một chiều}
 Nếu $u_{\btheta}$ thoả điều kiện biên \emph{chính xác}:
@@ -199,7 +216,7 @@ Cân bằng trọng số chỉ chạm tầng giữa; nó không cứu được b
 \end{itemize}
 \end{column}
 \begin{column}{0.47\textwidth}
-\textbf{Chín thí nghiệm}
+\textbf{Mười thí nghiệm}
 \begin{itemize}\footnotesize
 \item[TN1] hàm kích hoạt, ReLU
 \item[TN2] cái giá của ràng buộc mềm
@@ -210,6 +227,7 @@ Cân bằng trọng số chỉ chạm tầng giữa; nó không cứu được b
 \item[TN7] quét $\nu$
 \item[TN8] độ phân tán giữa hạt giống
 \item[TN9] chi phí tính toán
+\item[TN10] \alert{Burgers, áp dụng chính các biện pháp khắc phục}
 \end{itemize}
 \end{column}
 \end{columns}
@@ -242,6 +260,15 @@ Mục 4.3.4 kết luận "bài toán đòi hỏi độ chính xác cao nhất �
 mô hình học chậm nhất". \alert{Không đúng phổ quát} --- với toán tử elliptic thuần
 tuý, hàm mục tiêu phần dư \emph{ưu tiên} tần số cao.
 \end{block}
+\end{frame}
+
+%==============================================================
+\begin{frame}{Xem nó xảy ra: thứ tự học bị đảo chiều}
+\centering
+\hoathinh[0.68\textheight]{tn3_thien_kien_pho}
+
+\footnotesize Hồi quy học $k=1$ trước, $k=8$ sau cùng.
+Với hàm mục tiêu phần dư, sai số lại dồn về $k=1$.
 \end{frame}
 
 %==============================================================
@@ -433,7 +460,7 @@ và cùng cần thiết.
 \end{block}
 
 \begin{block}{Về thực nghiệm}
-Chín thí nghiệm với tiêu chí đặt trước. Kết quả tiêu cực được báo cáo đầy đủ ---
+Mười thí nghiệm với tiêu chí đặt trước. Kết quả tiêu cực được báo cáo đầy đủ ---
 ba trong số đó buộc phải siết lại chính các chương lý thuyết, và một dẫn tới
 một bổ đề mới.
 \end{block}

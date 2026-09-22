@@ -57,3 +57,8 @@ slides/*.nav
 slides/*.snm
 slides/*.vrb
 slides/slide.pdf
+
+# =========================
+# Anh chup TN10 cho animation (lon, sinh lai duoc)
+# =========================
+code/results/exp10_anh_seed*.npz
