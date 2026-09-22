@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: >-
+  Theoretical Foundations of Neural Networks and PINNs for
+  Differential Equations
+message: "If you use this software or the accompanying thesis, please cite it."
+type: software
+authors:
+  - family-names: Nguyễn
+    given-names: Hoàng Tú
+abstract: >-
+  A from-scratch PyTorch implementation of physics-informed neural networks,
+  written to test the theory it accompanies rather than to wrap an existing
+  library. Six experiments probe the failure modes the thesis predicts: the
+  degeneracy of ReLU under a second-order operator, the finite optimal penalty
+  weight of a soft boundary constraint, operator-induced reversal of spectral
+  bias, and a numerical certificate for the stability bound
+  ‖e‖ ≤ π⁻²‖r‖ — together with the hypothesis under which it fails.
+keywords:
+  - physics-informed neural networks
+  - scientific machine learning
+  - partial differential equations
+  - automatic differentiation
+  - spectral bias
+license: MIT
+version: 1.0.0
+date-released: "2026-09-05"

@@ -103,7 +103,7 @@ def flat_grad(loss: torch.Tensor, params) -> torch.Tensor:
     gs = torch.autograd.grad(loss, params, retain_graph=True, allow_unused=True)
     return torch.cat([
         (torch.zeros_like(p) if g is None else g).reshape(-1)
-        for g, p in zip(gs, params)
+        for g, p in zip(gs, params, strict=True)
     ])
 
 

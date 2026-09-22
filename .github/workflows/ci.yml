@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  # Pushes to a branch with an open pull request already fire a pull_request
+  # event, so listening to both would run every job twice.
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: tests (python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install
+        # The CPU wheel is ~200 MB rather than the ~2.5 GB CUDA default, and
+        # nothing here needs a GPU.
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[dev]"
+      - name: Lint
+        run: python -m ruff check .
+      - name: Test
+        run: python -m pytest
+
+  verify:
+    name: published numbers still hold
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[dev]"
+      - name: Re-derive every published number, and re-run experiment 1
+        # Deliberately NOT `git diff --exit-code` on code/results/: the number
+        # of BLAS threads changes the summation order inside each matmul, so a
+        # trained value is only reproducible to about two significant figures
+        # on a different machine. verify_results.py checks closed-form
+        # identities and internal consistency exactly, and trained values to
+        # the tolerance that was actually measured. See code/README.md.
+        run: cd code && python verify_results.py --chay-lai-tn1
+

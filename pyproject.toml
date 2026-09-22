@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pinns-thesis"
+version = "1.0.0"
+description = "Physics-informed neural networks written from scratch in PyTorch, with the six experiments that test the accompanying thesis."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["pinns", "scientific-machine-learning", "pde", "automatic-differentiation", "spectral-bias"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["torch>=2.0", "numpy>=1.24"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "ruff>=0.4"]
+
+[project.urls]
+Repository = "https://github.com/tu-h-nguyn/foundations-of-neural-networks-and-pinns-for-differential-equations"
+
+[tool.setuptools.packages.find]
+where = ["code"]
+include = ["pinns*"]
+
+[tool.pytest.ini_options]
+testpaths = ["code/tests"]
+addopts = "-q --strict-markers"
+# The package lives under code/, so `pytest` works from the repo root without
+# an editable install -- which is how a reader trying one command will run it.
+pythonpath = ["code"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["code"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "NPY"]
+ignore = [
+    # The thesis writes the penalty weight as `l` in sweeps; renaming it would
+    # break the correspondence with the text the code exists to reproduce.
+    "E741",
+    # NPY002 wants np.random.Generator. The legacy global seed is the point:
+    # set_seed() must pin every source at once, and the committed results in
+    # code/results/ were produced under it. Switching would silently
+    # invalidate them.
+    "NPY002",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# The experiment scripts mirror the thesis's own notation and layout: one-line
+# lambdas for f(x) and grouped imports keep each script readable beside the
+# equations it implements.
+# The experiment scripts mirror the thesis's own notation and layout: one-line
+# lambdas for f(x), and RK4 stages grouped onto a line each, keep every script
+# readable beside the equations it implements.
+"code/pinns/exp*.py" = ["E501", "E731", "E702"]
+"code/tests/*" = ["E501"]

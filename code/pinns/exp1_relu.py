@@ -4,8 +4,13 @@
 Khang dinh la mot DANG THUC CHINH XAC (grad = 0), nen kiem chung toi chu so may.
 """
 from __future__ import annotations
-import json, math, os
+
+import json
+import math
+import os
+
 import torch
+
 from .core import DTYPE, FNN, abs_linf, flat_grad, grad, rel_l2, set_seed, train_adam, uniform_1d
 
 PI = math.pi

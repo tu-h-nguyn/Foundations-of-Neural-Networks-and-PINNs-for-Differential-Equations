@@ -1,0 +1,11 @@
+# GitHub counts bytes when it detects languages, so the LaTeX sources would
+# otherwise drown out the Python package that is the actual codebase. The
+# thesis really is documentation, so mark it as such: the repository then
+# reports Python, which is what you can run.
+Sections/** linguist-documentation
+*.tex linguist-documentation
+
+# Binary assets: never try to merge or diff them as text.
+*.pdf binary
+*.jpg binary
+*.png binary

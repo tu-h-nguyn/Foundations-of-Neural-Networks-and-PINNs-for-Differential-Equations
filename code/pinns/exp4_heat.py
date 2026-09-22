@@ -9,10 +9,23 @@ nghiem chi chua mot mode Fourier duy nhat nen khong co van de thien kien pho.
 So sanh trong so co dinh voi thuat toan u trong so (alg:annealing).
 """
 from __future__ import annotations
-import json, math, os
+
+import json
+import math
+import os
+
 import torch
-from .core import (DTYPE, FNN, abs_linf, flat_grad, grad, imbalance, rel_l2,
-                   set_seed, train_adam, train_lbfgs)
+
+from .core import (
+    DTYPE,
+    FNN,
+    abs_linf,
+    grad,
+    imbalance,
+    rel_l2,
+    set_seed,
+    train_lbfgs,
+)
 
 PI = math.pi
 NU = 0.1

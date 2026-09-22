@@ -12,11 +12,15 @@ Cau hinh L-BFGS (max_iter = 800, history_size = 50, Wolfe manh) lay dung theo
 Doan ma 5.3 cua luan van. Rieng TN4 dung 500 vong theo dung mo ta trong Muc 5.4.
 """
 from __future__ import annotations
-import json, math, os
+
+import json
+import math
+import os
+
 import numpy as np
 import torch
-from .core import (DTYPE, FNN, abs_linf, grad, imbalance, rel_l2, set_seed,
-                   train_lbfgs)
+
+from .core import DTYPE, FNN, abs_linf, grad, imbalance, rel_l2, set_seed, train_lbfgs
 
 PI = math.pi
 NU = 0.01 / PI

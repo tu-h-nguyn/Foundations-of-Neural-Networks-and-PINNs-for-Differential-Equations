@@ -4,9 +4,14 @@ Quet lam_b qua sau bac do lon tren bai toan Poisson cua TN1, do sai so bien
 va hoi quy log--log de uoc luong so mu, doi chieu voi du bao lam_b^{-1}.
 """
 from __future__ import annotations
-import json, math, os
+
+import json
+import math
+import os
+
 import numpy as np
 import torch
+
 from .core import DTYPE, FNN, abs_linf, grad, rel_l2, set_seed, train_adam, uniform_1d
 
 PI = math.pi
