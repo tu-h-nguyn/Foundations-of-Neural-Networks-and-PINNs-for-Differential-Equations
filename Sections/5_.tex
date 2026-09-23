@@ -2023,9 +2023,132 @@ thiện $213$ lần của TN10 vì vậy phải được quy cho cấu hình m�
 và độ dài L-BFGS, không cho RAR.
 
 Kết luận này có phạm vi hẹp: một lịch RAR duy nhất ($500$ điểm sau mỗi đợt
-$1$--$3$), điểm cũ được giữ nguyên, và $n = 5$. Các biến thể lấy mẫu lại toàn bộ
-tập điểm theo phân phối tỉ lệ với $\abs{r}$ --- vốn giữ được mật độ điểm trên
-vùng trơn --- có thể tránh được sự đánh đổi ở Kết quả (c), và chưa được thử.
+$1$--$3$), điểm cũ được giữ nguyên, và $n = 5$. Một dự đoán tự nhiên là các biến
+thể lấy mẫu lại toàn bộ tập điểm theo phân phối tỉ lệ với $\abs{r}$, có giữ một
+phần mật độ trên vùng trơn, sẽ tránh được sự đánh đổi ở Kết quả (c).
+Mục~\ref{subsec:tn10-rad} kiểm dự đoán ấy, và nó sai.
+\end{nhanxet}
+
+\subsection{Lấy mẫu lại toàn bộ: kiểm dự đoán của Nhận xét~\ref{nx:rar-cuc-bo}}
+\label{subsec:tn10-rad}
+
+Nhận xét~\ref{nx:rar-cuc-bo} đưa ra một dự đoán cụ thể: sự đánh đổi giữa lớp
+sốc và vùng trơn đến từ việc RAR \emph{thêm} điểm vào lớp sốc mà không giữ mật
+độ ở nơi khác, nên một biến thể \emph{lấy mẫu lại toàn bộ} có giữ mật độ vùng
+trơn sẽ tránh được nó. Mục này kiểm dự đoán ấy.
+
+\textbf{Thiết kế.} Dùng phương pháp RAD của Wu và cộng sự~\cite{wu2023}: sau mỗi
+đợt L-BFGS từ $1$ tới $5$, bỏ \emph{toàn bộ} $10\,000$ điểm phần dư và lấy lại
+$10\,000$ điểm từ $100\,000$ ứng viên rải đều, với xác suất
+\begin{equation}
+p(\bx) \;\propto\; \frac{\abs{r(\bx)}^{k}}{\mathbb{E}\big[\abs{r}^{k}\big]} + c .
+\label{eq:rad}
+\end{equation}
+Hạng $c$ giữ một phần khối lượng xác suất phân bố đều, tức giữ mật độ điểm trên
+vùng trơn. Hai nhánh, rẽ từ \emph{cùng} trạng thái như
+Mục~\ref{subsec:tn10-tachbien}: $k = 1$, $c = 1$ (giá trị mặc định mà Wu và cộng
+sự khuyến nghị) và $k = 1$, $c = 0$ (tỉ lệ thuận $\abs{r}$, không giữ vùng
+trơn). Số điểm luôn là $10\,000$, bằng nhánh không thêm điểm, nên so sánh cặp
+với nhánh ấy là công bằng. Phần chung của cả năm hạt giống trùng
+Mục~\ref{subsec:tn10-tachbien} từng bit.
+
+\textbf{Ba giả thuyết, ghi trong mã nguồn trước khi chạy.}
+(H1) RAD với $c = 1$ tốt hơn nhánh không thêm điểm về $\varepsilon_{L^2}$ ở ít
+nhất bốn trên năm hạt giống.
+(H2) RAD với $c = 1$ không làm vùng trơn tệ đi: trung vị sai số điển hình ngoài
+dải không vượt $1{,}02\times10^{-4}$ của nhánh không thêm điểm.
+(H3) Chính hạng $c$ là thứ bảo vệ vùng trơn: $c = 1$ tốt hơn $c = 0$ ở ngoài dải
+ở ít nhất bốn trên năm hạt giống.
+
+\begin{table}[H]
+\centering
+\caption[Bốn cách xử lý điểm phối trí]{Bốn cách xử lý điểm phối trí trên năm hạt
+giống, rẽ từ cùng trạng thái sau đợt L-BFGS thứ nhất. Trung vị; khoảng ghi dưới
+đơn vị $10^{-4}$. Hàng ``thắng'' đếm số hạt giống mà nhánh ấy tốt hơn nhánh
+\emph{không thêm} trên cùng hạt giống.}
+\label{tab:tn10c}
+\footnotesize
+\begin{tabular}{@{}l l l l l@{}}
+\toprule
+& \textbf{không thêm} & \textbf{RAR} & \textbf{RAD, $c = 0$}
+  & \textbf{RAD, $c = 1$} \\
+\midrule
+$\varepsilon_{L^2}$ & $7{,}18\times10^{-4}$ & $6{,}48\times10^{-4}$
+  & $8{,}21\times10^{-4}$ & $6{,}69\times10^{-4}$ \\
+\quad khoảng ($\times10^{-4}$) & $[3{,}84;\ 13{,}2]$ & $[3{,}85;\ 8{,}33]$
+  & $[4{,}49;\ 13{,}1]$ & $[3{,}05;\ 15{,}0]$ \\
+\quad thắng & --- & $3/5$ & $3/5$ & $2/5$ \\
+\addlinespace
+sai số điển hình ngoài dải & $\mathbf{1{,}02\times10^{-4}}$ & $1{,}42\times10^{-4}$
+  & $1{,}36\times10^{-4}$ & $1{,}16\times10^{-4}$ \\
+\quad thắng & --- & $0/5$ & $0/5$ & $0/5$ \\
+\addlinespace
+$\max\abs{u_{\btheta} - u}$ & $9{,}75\times10^{-3}$ & $8{,}51\times10^{-3}$
+  & $1{,}04\times10^{-2}$ & $8{,}91\times10^{-3}$ \\
+\quad thắng & --- & $4/5$ & $3/5$ & $2/5$ \\
+\addlinespace
+điểm phối trí nằm trong dải & $1{,}4\%$ & $4{,}5\%$ & $4{,}1\%$ & $3{,}3\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Images/chap_5/fig59_tn10c.pdf}
+\caption[Bốn cách xử lý điểm phối trí theo từng hạt giống]{Bốn cách xử lý điểm
+phối trí; mỗi đường nối là một hạt giống. (a) Với $\varepsilon_{L^2}$, các
+đường cắt nhau chằng chịt: không chiến lược nào thắng nhất quán. (b) Sai số điển
+hình ngoài dải sốc: nhánh không thêm điểm thấp nhất ở \emph{mọi} hạt giống.
+(c) Sai số lớn nhất.}
+\label{fig:tn10c}
+\end{figure}
+
+\textbf{Kết quả: H1 không đạt, H2 không đạt, H3 đạt.}
+RAD với $c = 1$ chỉ tốt hơn nhánh không thêm điểm ở hai trên năm hạt giống
+(H1), và sai số vùng trơn của nó cao hơn nhánh ấy ở \emph{cả năm} hạt giống,
+trung vị $1{,}16\times10^{-4}$ so với $1{,}02\times10^{-4}$ (H2). Hạng $c$ có
+tác dụng đúng hướng --- $c = 1$ giữ vùng trơn tốt hơn $c = 0$ ở bốn trên năm hạt
+giống (H3) --- nhưng chỉ \emph{giảm} thiệt hại, không xoá được nó. Dự đoán ở
+Nhận xét~\ref{nx:rar-cuc-bo} vì vậy sai ở điểm chính.
+
+Hai quan sát khác quan trọng hơn chính ba giả thuyết.
+
+\emph{Thứ nhất, sự đánh đổi là quy luật chứ không phải đặc điểm của RAR.} Cả ba
+chiến lược thích nghi --- RAR, RAD với $c = 0$, RAD với $c = 1$ --- đều cho sai
+số vùng trơn cao hơn tập điểm cố định, ở \emph{mười lăm trên mười lăm} lần so
+sánh cặp (Hình~\ref{fig:tn10c}(b)). Đây là kết quả nhất quán nhất của toàn bộ
+chuỗi thí nghiệm lấy mẫu. Cách giải thích đơn giản nhất: với số điểm cố định,
+mọi điểm dời vào lớp sốc là một điểm lấy khỏi vùng trơn, và ở mức sai số này
+vùng trơn đóng góp khoảng một nửa $\varepsilon_{L^2}$ (Kết quả~3). Đáng chú ý là
+cả ba chiến lược đều dời điểm rất nhẹ tay --- dải sốc chỉ nhận $3$--$5\%$ tổng số
+điểm, so với $1{,}4\%$ khi rải đều --- vậy mà vùng trơn vẫn tệ đi ở mọi hạt giống.
+
+\emph{Thứ hai, chiến lược lấy mẫu không phải yếu tố quyết định ở cấu hình này.}
+Chiến lược tốt nhất về $\varepsilon_{L^2}$ đổi theo từng hạt giống: RAD $c = 0$
+ở hạt giống $0$, không thêm điểm ở hạt giống $1$ và $3$, RAD $c = 1$ ở hạt giống
+$2$, RAR ở hạt giống $4$. Trên cùng một hạt giống, bốn chiến lược chênh nhau
+$1{,}4$--$2{,}6$ lần; trên cùng một chiến lược, năm hạt giống chênh nhau
+$2{,}2$--$4{,}9$ lần. Hai độ phân tán cùng bậc, nên với $n = 5$ không thể xếp hạng
+các chiến lược theo $\varepsilon_{L^2}$.
+
+\begin{nhanxet}[Kết luận của chuỗi thí nghiệm lấy mẫu]
+\label{nx:lay-mau}
+Mục~\ref{sec:tn10} cùng hai mục con của nó cho một kết luận nhất quán: ở cấu hình đã đủ
+mạnh --- mạng tám lớp ẩn, $10\,000$ điểm, L-BFGS dài --- cách đặt điểm phối trí là
+yếu tố \emph{bậc hai}. Không chiến lược thích nghi nào trong ba chiến lược thử
+nghiệm cải thiện nhất quán sai số toàn cục; cả ba đều trả giá ở vùng trơn; và
+chỉ RAR dạng thêm điểm cải thiện nhất quán sai số lớn nhất tại lớp sốc. Ghi chú
+ở Bảng~\ref{tab:remedies} rằng lấy mẫu thích nghi ``tập trung tài nguyên vào vùng
+có cấu trúc dốc'' vì vậy cần được đọc hẹp: với ngân sách điểm cho trước, nó \emph{phân
+phối lại} sai số giữa các vùng, chứ không làm giảm tổng sai số.
+
+Phạm vi: một bài toán, một cấu hình, $n = 5$, và các tham số $k$, $c$, lịch lấy
+mẫu lấy theo mặc định của tài liệu chứ không được dò. Kết luận này \emph{không}
+bác bỏ các cải thiện mà Wu và cộng sự~\cite{wu2023} báo cáo: thiết lập của họ
+khác ở số điểm phối trí, lịch lấy mẫu và ngân sách huấn luyện. Một giả thuyết
+tương thích với cả hai là lợi ích của lấy mẫu thích nghi giảm dần khi số điểm
+phối trí đã đủ lớn so với thang độ dài của nghiệm; kiểm giả thuyết ấy cần một
+phép quét theo $N_r$.
 \end{nhanxet}
 
 %==============================================================================
@@ -2242,8 +2365,10 @@ bằng thí nghiệm tách biến ở Mục~\ref{subsec:tn10-tachbien}, và kế
 dự báo ban đầu của chính mục này: RAR \emph{không} phải kỹ thuật cải thiện rõ
 nhất cho $\varepsilon_{L^2}$ --- đóng góp của nó nhỏ và không nhất quán --- mà
 là công cụ cho sai số \emph{cục bộ} tại lớp sốc
-(Nhận xét~\ref{nx:rar-cuc-bo}). Hạn chế còn lại là chỉ một lịch RAR được thử;
-các biến thể lấy mẫu lại toàn bộ theo $\abs{r}$ chưa được đo.
+(Nhận xét~\ref{nx:rar-cuc-bo}). Biến thể lấy mẫu lại toàn bộ (RAD) cũng đã được
+đo ở Mục~\ref{subsec:tn10-rad} và không cải thiện được điều đó. Hạn chế còn lại
+là các tham số $k$, $c$ và lịch lấy mẫu chưa được dò, và chưa có phép quét theo
+$N_r$ để biết lợi ích của lấy mẫu thích nghi phụ thuộc số điểm ra sao.
  
 \item \emph{Nghiệm tham chiếu cho Burgers là nghiệm số.} Dù đã kiểm chứng hội tụ
 lưới ($2{,}31\times10^{-4}$), đây vẫn không phải nghiệm giải tích, nên kết luận về
@@ -2393,7 +2518,9 @@ Nhưng kết quả tích cực nhất chương này cũng được đọc với 
 kết quả tiêu cực. Thí nghiệm tách biến cho thấy lấy mẫu thích nghi --- biện pháp
 mà báo cáo kỳ vọng nhiều nhất --- chỉ đóng góp khoảng $2\%$ (thang logarit) của
 mức cải thiện, và không nhất quán giữa các hạt giống; tác dụng thật của nó là
-cục bộ tại lớp sốc (Nhận xét~\ref{nx:rar-cuc-bo}). Và kết quả ấy chỉ thu hẹp
+cục bộ tại lớp sốc (Nhận xét~\ref{nx:rar-cuc-bo}). Biến thể lấy mẫu lại toàn bộ
+cũng không khá hơn, và cả ba chiến lược thích nghi đều làm vùng trơn tệ đi ở
+mười lăm trên mười lăm lần so sánh (Nhận xét~\ref{nx:lay-mau}). Và kết quả ấy chỉ thu hẹp
 khoảng cách chi phí $1{,}6$ lần --- vẫn bốn bậc độ lớn.
 
 Hai kết quả cuối cùng ấy minh hoạ đúng vai trò của chương: bước kiểm chứng số không

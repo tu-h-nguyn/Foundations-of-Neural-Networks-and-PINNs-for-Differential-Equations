@@ -500,10 +500,50 @@ def hinh_tn10b():
     print("  ->", ra)
 
 
+def hinh_tn10c():
+    """Hinh 5.9: bon chien luoc lay mau tren cung trang thai re nhanh. Hai nhanh
+    khong_them/rar lay tu TN10b, hai nhanh RAD tu TN10c."""
+    rb = [json.load(open(os.path.join(RES, f"exp10b_seed{s}.json"))) for s in range(5)]
+    rc = [json.load(open(os.path.join(RES, f"exp10c_seed{s}.json"))) for s in range(5)]
+
+    def gt(ten, i, k):
+        r = rc[i] if ten.startswith("rad") else rb[i]
+        return r["nhanh"][ten]["cuoi"][k]
+
+    nhanh = ["khong_them", "rar", "rad_c0", "rad_c1"]
+    nhan = ["không\nthêm", "RAR\n(thêm điểm)", "RAD\n$c = 0$", "RAD\n$c = 1$"]
+    mau = [THAM, PINN, CAM, NGOC]
+    muc = [("eps_L2", r"(a) $\varepsilon_{L^2}$"),
+           ("trung_vi_ngoai_dai", "(b) sai số điển hình\nngoài dải sốc"),
+           ("eps_Linf", "(c) sai số lớn nhất\n" r"$\max\,|u_\theta - u|$")]
+    fig, axs = plt.subplots(1, 3, figsize=(9.6, 3.7))
+    fig.subplots_adjust(left=0.075, right=0.985, top=0.76, bottom=0.2, wspace=0.38)
+    for ax, (k, tieu) in zip(axs, muc):
+        for i in range(5):
+            v = [gt(n, i, k) for n in nhanh]
+            ax.plot(range(4), v, color=LUOI, lw=1.2, zorder=1)
+            for j in range(4):
+                ax.plot(j, v[j], "o", color=mau[j], ms=7, mec=MAT, mew=1.5, zorder=3)
+        for j, n in enumerate(nhanh):
+            tv = st.median(gt(n, i, k) for i in range(5))
+            ax.plot([j - 0.25, j + 0.25], [tv] * 2, color=CHU, lw=2, zorder=4)
+        ax.set_yscale("log")
+        ax.set_xticks(range(4)); ax.set_xticklabels(nhan, fontsize=8)
+        ax.set_xlim(-0.5, 3.5); ax.grid(axis="x", visible=False)
+        ax.set_title(tieu, loc="left")
+    fig.text(0.075, 0.93, "Bốn cách xử lý điểm phối trí, rẽ từ cùng trạng thái sau đợt "
+             "L-BFGS thứ nhất. Mỗi đường nối là một hạt giống; vạch đen là trung vị.",
+             fontsize=8.5, color=CHU2)
+    ra = os.path.join(GOC, "Images", "chap_5", "fig59_tn10c.pdf")
+    fig.savefig(ra); plt.close(fig)
+    print("  ->", ra)
+
+
 if __name__ == "__main__":
     torch.set_num_threads(max(1, torch.get_num_threads()))
     cai = sys.argv[1] if len(sys.argv) > 1 else "tat_ca"
     bang = {"relu": anim_relu, "pho": anim_pho, "burgers": anim_burgers,
-            "vatly": anim_vatly, "hinh": hinh_tn10, "tachbien": hinh_tn10b}
+            "vatly": anim_vatly, "hinh": hinh_tn10, "tachbien": hinh_tn10b,
+            "rad": hinh_tn10c}
     for k in (bang if cai == "tat_ca" else [cai]):
         bang[k]()

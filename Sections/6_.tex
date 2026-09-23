@@ -64,8 +64,11 @@ của ngân sách chứ không của phương pháp. Nhưng tỉ số chi phí s
 hạn vẫn ở bậc $10^{4}$ ($1{,}1\times10^{4}$ lần, so với $1{,}8\times10^{4}$ ở
 Mục~\ref{sec:tn9}): PINN \emph{có thể} chính xác trên bài toán cứng này, chỉ
 không rẻ hơn. Thí nghiệm tách biến đi kèm còn chỉ ra rằng mức cải thiện ấy gần
-như hoàn toàn đến từ cấu hình mạng, số điểm phối trí và độ dài L-BFGS; lấy mẫu
-thích nghi chỉ cải thiện sai số \emph{cục bộ} tại lớp sốc.
+như hoàn toàn đến từ cấu hình mạng, số điểm phối trí và độ dài L-BFGS. Ba chiến
+lược lấy mẫu thích nghi --- thêm điểm, và hai biến thể lấy mẫu lại toàn bộ ---
+không chiến lược nào cải thiện nhất quán sai số toàn cục, và cả ba đều làm vùng
+trơn tệ đi ở mọi hạt giống: ở cấu hình này, cách đặt điểm phối trí chỉ phân phối
+lại sai số giữa các vùng.
 
 \paragraph{MT5 --- Khảo sát độ nhạy và phân tích hạn chế.}
 Đã hoàn thành ở mức tương xứng với ngân sách tính toán, nhưng đây cũng là nhiệm
@@ -211,10 +214,10 @@ và riêng nó đã loại được bốn con số không tiêu biểu. Việc c
 \emph{cách trình bày} --- gộp trung vị và khoảng vào chính các bảng của
 Mục~\ref{sec:tn1}--\ref{sec:tn7} thay vì để riêng ở Mục~\ref{sec:tn8} --- và
 nâng $n$ từ $5$ lên $10$--$20$ cho những đại lượng lệch mạnh. Hai việc rẻ khác:
-thử các biến thể lấy mẫu thích nghi \emph{lấy mẫu lại toàn bộ} tập điểm theo
-$\abs{r}$ --- vì Mục~\ref{subsec:tn10-tachbien} cho thấy RAR dạng \emph{thêm
-điểm} đổi sai số ở lớp sốc lấy sai số ở vùng trơn, và một biến thể giữ mật độ
-điểm trên vùng trơn có thể tránh được sự đánh đổi ấy;
+quét số điểm phối trí $N_r$ cho cả bốn cách xử lý điểm ở
+Mục~\ref{subsec:tn10-rad} --- vì kết quả ở đó cho thấy lấy mẫu thích nghi chỉ
+phân phối lại sai số ở $N_r = 10\,000$, và câu hỏi còn mở là lợi ích mà tài liệu
+báo cáo có xuất hiện lại khi $N_r$ nhỏ hay không;
 và tách riêng tầng thứ nhất của Bảng~\ref{tab:ba-nguyen-nhan} bằng một thiết kế
 khác với Mục~\ref{sec:tn7}. Phép quét $\nu$ ở đó cho thấy tỉ số
 $\norm{e_{\btheta}}/\norm{r_{\btheta}}$ do huấn luyện sinh ra không đo được hằng

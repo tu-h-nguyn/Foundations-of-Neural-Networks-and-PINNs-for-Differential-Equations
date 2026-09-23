@@ -90,6 +90,7 @@ thì trọng số phổ nhân thêm k⁴ và thứ tự **đảo ngược**: sai
 | TN9 | PINN tốn bao nhiêu? | c = 2,67 ≤ 3 (khớp); đồ thị bậc hai ×8,4 (ước lượng cũ thấp) |
 | **TN10** | **Áp dụng chính các biện pháp khắc phục thì sao?** | **213× tốt hơn TN5, sai số 6,48·10⁻⁴** |
 | TN10b | Trong 213× ấy, RAR đóng góp bao nhiêu? (tách biến, 3 nhánh × 5 hạt giống) | Chỉ ~2% (thang log), không nhất quán; tác dụng thật là **cục bộ** tại sốc |
+| TN10c | Lấy mẫu lại toàn bộ (RAD) có tránh được đánh đổi của RAR? (3 giả thuyết đặt trước) | **Không**: H1, H2 không đạt, H3 đạt; mọi chiến lược thích nghi làm vùng trơn tệ đi **15/15** |
 
 ## Trung thực về con số
 
@@ -105,6 +106,13 @@ thì trọng số phổ nhân thêm k⁴ và thứ tự **đảo ngược**: sai
   - tác dụng thật của RAR là **cục bộ**: sai số lớn nhất tại sốc giảm ở 4/5 hạt giống,
     phần sai số trong dải sốc 79% → 51%, đổi lại vùng trơn tệ đi nhẹ.
   Nhánh RAR khớp TN10 **từng bit** trên cả 5 hạt giống.
+- Báo cáo từng dự đoán rằng lấy mẫu lại toàn bộ, có giữ mật độ vùng trơn (RAD,
+  Wu và cs. 2023), sẽ tránh được sự đánh đổi ấy. **TN10c** kiểm dự đoán này với ba
+  giả thuyết ghi vào mã nguồn *trước khi chạy*, và dự đoán **sai**: RAD (c = 1)
+  chỉ thắng "không thêm" ở 2/5 hạt giống và làm vùng trơn tệ đi ở 5/5. Kết luận
+  vững nhất của cả chuỗi: ba chiến lược thích nghi đều làm vùng trơn tệ hơn tập
+  điểm cố định ở **15/15** lần so sánh — ở cấu hình này, cách đặt điểm chỉ
+  *phân phối lại* sai số.
 - Tái lập từng chữ số cần cố định cả hạt giống **lẫn** `OMP_NUM_THREADS=1`
   (số luồng BLAS một mình nó đổi sai số Burgers 1,7 lần — xem `code/README.md`).
 
@@ -134,6 +142,8 @@ for s in 0 1 2 3 4; do python -m pinns.exp10_burgers_manh $s & done; wait
 python -m pinns.exp10_burgers_manh tong_ket
 for s in 0 1 2 3 4; do python -m pinns.exp10b_rar_tachbien $s & done; wait
 python -m pinns.exp10b_rar_tachbien tong_ket  # tách biến RAR (~2 giờ)
+for s in 0 1 2 3 4; do python -m pinns.exp10c_rad $s & done; wait
+python -m pinns.exp10c_rad tong_ket           # RAD, in DAT / KHONG DAT cho H1–H3
 python -m pinns.animate tat_ca               # dựng lại toàn bộ GIF và hình TN10
 ```
 
