@@ -458,10 +458,52 @@ def hinh_tn10():
     fig.savefig(ra); plt.close(fig)
     print("  ->", ra)
 
+def hinh_tn10b():
+    """Hinh 5.8: tach bien RAR. Moi hat giong mot duong noi ba nhanh, de doc
+    so sanh CAP (cung hat giong, cung trang thai re nhanh) chu khong chi trung vi."""
+    rs = [json.load(open(os.path.join(RES, f"exp10b_seed{s}.json")))
+          for s in range(5)]
+    nhanh = ["khong_them", "ngau_nhien", "rar"]
+    nhan = ["không thêm", "ngẫu nhiên\n(cùng số điểm)", "RAR"]
+    mau = [THAM, CAM, PINN]
+    muc = [("eps_L2", r"(a) $\varepsilon_{L^2}$", True),
+           ("eps_Linf", r"(b) $\max\,|u_\theta - u|$", True),
+           ("phan_sai_so_trong_dai", "(c) % bình phương sai số\ntrong dải sốc", False)]
+    fig, axs = plt.subplots(1, 3, figsize=(9.6, 3.7))
+    fig.subplots_adjust(left=0.075, right=0.985, top=0.76, bottom=0.18, wspace=0.42)
+    for ax, (k, tieu, log) in zip(axs, muc):
+        for r in rs:
+            v = [r["nhanh"][n]["cuoi"][k] * (1 if log else 100) for n in nhanh]
+            ax.plot(range(3), v, color=LUOI, lw=1.2, zorder=1)
+            for i in range(3):
+                ax.plot(i, v[i], "o", color=mau[i], ms=7, mec=MAT, mew=1.5, zorder=3)
+        tv = [st.median(r["nhanh"][n]["cuoi"][k] for r in rs) * (1 if log else 100)
+              for n in nhanh]
+        for i in range(3):
+            ax.plot([i - 0.22, i + 0.22], [tv[i]] * 2, color=CHU, lw=2, zorder=4)
+        if log:
+            ax.set_yscale("log")
+        else:
+            ax.set_ylim(0, 100); ax.set_ylabel("%")
+        ax.set_xticks(range(3)); ax.set_xticklabels(nhan, fontsize=8.5)
+        ax.set_xlim(-0.5, 2.5); ax.grid(axis="x", visible=False)
+        ax.set_title(tieu, loc="left")
+    axs[2].axhline(100 * rs[0]["sau_dot_1"]["ti_le_dai"], color=CHU2, lw=0.8,
+                   ls=(0, (3, 3)))
+    axs[2].text(2.45, 100 * rs[0]["sau_dot_1"]["ti_le_dai"] + 2.5,
+                "diện tích dải: 1,4%", ha="right", fontsize=7.5, color=CHU2)
+    fig.text(0.075, 0.93, "Mỗi đường nối là một hạt giống; vạch đen là trung vị. "
+             "Ba nhánh rẽ ra từ cùng trạng thái sau đợt L-BFGS thứ nhất.",
+             fontsize=8.5, color=CHU2)
+    ra = os.path.join(GOC, "Images", "chap_5", "fig58_tn10b.pdf")
+    fig.savefig(ra); plt.close(fig)
+    print("  ->", ra)
+
+
 if __name__ == "__main__":
     torch.set_num_threads(max(1, torch.get_num_threads()))
     cai = sys.argv[1] if len(sys.argv) > 1 else "tat_ca"
     bang = {"relu": anim_relu, "pho": anim_pho, "burgers": anim_burgers,
-            "vatly": anim_vatly, "hinh": hinh_tn10}
+            "vatly": anim_vatly, "hinh": hinh_tn10, "tachbien": hinh_tn10b}
     for k in (bang if cai == "tat_ca" else [cai]):
         bang[k]()

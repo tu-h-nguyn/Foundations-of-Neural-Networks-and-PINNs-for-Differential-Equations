@@ -63,7 +63,9 @@ $6{,}48\times10^{-4}$ --- xác nhận rằng con số của Mục~\ref{sec:tn5} 
 của ngân sách chứ không của phương pháp. Nhưng tỉ số chi phí so với sai phân hữu
 hạn vẫn ở bậc $10^{4}$ ($1{,}1\times10^{4}$ lần, so với $1{,}8\times10^{4}$ ở
 Mục~\ref{sec:tn9}): PINN \emph{có thể} chính xác trên bài toán cứng này, chỉ
-không rẻ hơn.
+không rẻ hơn. Thí nghiệm tách biến đi kèm còn chỉ ra rằng mức cải thiện ấy gần
+như hoàn toàn đến từ cấu hình mạng, số điểm phối trí và độ dài L-BFGS; lấy mẫu
+thích nghi chỉ cải thiện sai số \emph{cục bộ} tại lớp sốc.
 
 \paragraph{MT5 --- Khảo sát độ nhạy và phân tích hạn chế.}
 Đã hoàn thành ở mức tương xứng với ngân sách tính toán, nhưng đây cũng là nhiệm
@@ -209,9 +211,10 @@ và riêng nó đã loại được bốn con số không tiêu biểu. Việc c
 \emph{cách trình bày} --- gộp trung vị và khoảng vào chính các bảng của
 Mục~\ref{sec:tn1}--\ref{sec:tn7} thay vì để riêng ở Mục~\ref{sec:tn8} --- và
 nâng $n$ từ $5$ lên $10$--$20$ cho những đại lượng lệch mạnh. Hai việc rẻ khác:
-một thí nghiệm tách biến cho Mục~\ref{sec:tn10} --- cùng cấu hình, bỏ RAR --- để
-đo vai trò riêng của lấy mẫu thích nghi, vốn hiện chưa tách được khỏi ba thay đổi
-đi kèm (Nhận xét~\ref{nx:khong-quy-cong-rar});
+thử các biến thể lấy mẫu thích nghi \emph{lấy mẫu lại toàn bộ} tập điểm theo
+$\abs{r}$ --- vì Mục~\ref{subsec:tn10-tachbien} cho thấy RAR dạng \emph{thêm
+điểm} đổi sai số ở lớp sốc lấy sai số ở vùng trơn, và một biến thể giữ mật độ
+điểm trên vùng trơn có thể tránh được sự đánh đổi ấy;
 và tách riêng tầng thứ nhất của Bảng~\ref{tab:ba-nguyen-nhan} bằng một thiết kế
 khác với Mục~\ref{sec:tn7}. Phép quét $\nu$ ở đó cho thấy tỉ số
 $\norm{e_{\btheta}}/\norm{r_{\btheta}}$ do huấn luyện sinh ra không đo được hằng

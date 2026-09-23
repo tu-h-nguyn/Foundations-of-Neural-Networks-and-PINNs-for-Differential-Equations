@@ -49,7 +49,9 @@ bằng bài toán ngược, dữ liệu biên khuyết và số chiều cao ch�
 đề xuất --- cấu hình của công trình gốc cùng lấy mẫu thích nghi --- đưa sai số
 Burgers trung vị từ $1{,}38\times10^{-1}$ xuống $6{,}48\times10^{-4}$, tức tốt hơn
 $213$ lần và cùng bậc với công trình gốc, nhưng khoảng cách về chi phí vẫn ở bậc
-$10^{4}$ (Mục~\ref{sec:tn10}).
+$10^{4}$ (Mục~\ref{sec:tn10}). Một thí nghiệm tách biến cho thấy mức cải thiện ấy
+đến gần như hoàn toàn từ cấu hình mạng và tối ưu hoá, còn lấy mẫu thích nghi chỉ
+cải thiện sai số cục bộ tại lớp sốc.
 
 \bigskip
 \noindent\textbf{Từ khoá:} mạng nơ-ron thông tin vật lý, phương trình vi phân,
@@ -101,7 +103,9 @@ dimension rather than from cost. Finally, applying the remedies the report itsel
 original authors' configuration together with residual-based adaptive
 refinement -- lowers the median Burgers error from $1.38\times10^{-1}$ to
 $6.48\times10^{-4}$, a $213$-fold improvement on par with the original work,
-while the cost gap stays at four orders of magnitude.
+while the cost gap stays at four orders of magnitude. An ablation shows the gain
+comes almost entirely from the network and optimiser configuration; adaptive
+sampling only improves the local error at the shock.
 
 \bigskip
 \noindent\textbf{Keywords:} physics-informed neural networks, differential

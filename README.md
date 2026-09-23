@@ -50,10 +50,10 @@ cáo tự đề xuất.
 </p>
 
 Sóng sin dựng đứng thành một lớp sốc dày cỡ 10⁻² tại x = 0 (độ dốc 150 tại
-t = 0,5). PINN bám được cả lớp sốc. Sai số lớn nhất (5,6·10⁻³) vẫn nằm trong lớp
-sốc, nhưng — điều bất ngờ — gần 90% sai số L² nay đến từ vùng trơn, nơi sai số
-trải đều ở mức ~2·10⁻⁴ (panel dưới, thang log; tính ở độ chính xác kép từ trọng
-số đã lưu).
+t = 0,5). PINN bám được cả lớp sốc. Ở cả năm hạt giống, sai số lớn nhất nằm trong
+lớp sốc; dải sốc chỉ chiếm 1,4% diện tích nhưng chứa khoảng một nửa (trung vị 51%)
+bình phương sai số — nửa còn lại là mức nền ~10⁻⁴ trên vùng trơn (panel dưới, thang
+log; tính ở độ chính xác kép từ trọng số đã lưu).
 
 ### Thí nghiệm 1 — ReLU đứng yên, tanh hội tụ
 
@@ -89,6 +89,7 @@ thì trọng số phổ nhân thêm k⁴ và thứ tự **đảo ngược**: sai
 | TN8 | Cái gì sống sót qua 5 hạt giống? | Mọi kết luận định tính; loại bỏ 4 con số |
 | TN9 | PINN tốn bao nhiêu? | c = 2,67 ≤ 3 (khớp); đồ thị bậc hai ×8,4 (ước lượng cũ thấp) |
 | **TN10** | **Áp dụng chính các biện pháp khắc phục thì sao?** | **213× tốt hơn TN5, sai số 6,48·10⁻⁴** |
+| TN10b | Trong 213× ấy, RAR đóng góp bao nhiêu? (tách biến, 3 nhánh × 5 hạt giống) | Chỉ ~2% (thang log), không nhất quán; tác dụng thật là **cục bộ** tại sốc |
 
 ## Trung thực về con số
 
@@ -96,8 +97,14 @@ thì trọng số phổ nhân thêm k⁴ và thứ tự **đảo ngược**: sai
   `code/results/*.json`, sinh bởi mã trong `code/pinns/`.
 - Hoạt hình Burgers dùng hạt giống **trung vị**, không phải hạt giống đẹp nhất.
 - TN10 đổi **bốn** thứ cùng lúc so với TN5 (mạng sâu hơn, 4× điểm phối trí, L-BFGS
-  dài hơn, RAR). Phần lớn cải thiện đã có **trước khi thêm điểm RAR nào**, nên
-  báo cáo *không* quy công cho riêng RAR — chưa làm thí nghiệm tách biến.
+  dài hơn, RAR). Thí nghiệm tách biến **TN10b** rẽ ba nhánh từ cùng một trạng thái
+  (RAR / thêm điểm ngẫu nhiên cùng số lượng / không thêm) và cho thấy:
+  - trên ε_L², RAR chỉ thắng "không thêm" ở **3/5** hạt giống (trung vị 6,48 so với
+    7,18·10⁻⁴) — mức cải thiện 213× đến gần như hoàn toàn từ mạng + số điểm + L-BFGS;
+  - thêm điểm **ngẫu nhiên** không giúp gì → vấn đề không phải số lượng điểm;
+  - tác dụng thật của RAR là **cục bộ**: sai số lớn nhất tại sốc giảm ở 4/5 hạt giống,
+    phần sai số trong dải sốc 79% → 51%, đổi lại vùng trơn tệ đi nhẹ.
+  Nhánh RAR khớp TN10 **từng bit** trên cả 5 hạt giống.
 - Tái lập từng chữ số cần cố định cả hạt giống **lẫn** `OMP_NUM_THREADS=1`
   (số luồng BLAS một mình nó đổi sai số Burgers 1,7 lần — xem `code/README.md`).
 
@@ -125,6 +132,8 @@ export OMP_NUM_THREADS=1
 python -m pinns.exp1_relu                    # ... tới exp9_chiphi
 for s in 0 1 2 3 4; do python -m pinns.exp10_burgers_manh $s & done; wait
 python -m pinns.exp10_burgers_manh tong_ket
+for s in 0 1 2 3 4; do python -m pinns.exp10b_rar_tachbien $s & done; wait
+python -m pinns.exp10b_rar_tachbien tong_ket  # tách biến RAR (~2 giờ)
 python -m pinns.animate tat_ca               # dựng lại toàn bộ GIF và hình TN10
 ```
 

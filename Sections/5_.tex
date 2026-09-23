@@ -1828,24 +1828,23 @@ ngưỡng đọc số phải là một bậc độ lớn'' hoá ra là đặc đ
 luyện chưa hội tụ}, không phải của bài toán: khi tối ưu hoá đi đủ xa, các hạt
 giống hội tụ về cùng một mức.
 
-\textbf{Kết quả 3: sai số lớn nhất vẫn ở lớp sốc, nhưng phần lớn sai số $L^2$
-thì không còn ở đó.} Tỉ số $\varepsilon_{L^\infty}/\varepsilon_{L^2}$ gần như
-không đổi --- khoảng $15$ ở Mục~\ref{sec:tn5}, khoảng $13$ ở TN10 --- và điểm
-sai số lớn nhất của hạt giống trung vị,
-$\abs{u_{\btheta} - u} = 5{,}64\times10^{-3}$, nằm tại $x \approx 0{,}002$,
-$t = 0{,}45$: ngay trong lớp sốc. Nhưng một phép đếm trực tiếp trên lưới đánh giá
-cho bức tranh khác với cách đọc ở Mục~\ref{sec:tn5}. Dải $\abs{x} < 0{,}02$ sau
-thời điểm hình thành sốc $t_b = 1/\pi$ chiếm $1{,}4\%$ diện tích miền nhưng chỉ
-chứa $12{,}4\%$ tổng bình phương sai số; ngoài dải ấy, sai số lớn nhất là
-$1{,}64\times10^{-3}$ và trung vị là $2{,}2\times10^{-4}$. Nói cách khác, lớp sốc
-vẫn là nơi sai số \emph{đậm đặc} nhất --- gấp khoảng chín lần mức trung bình
-theo diện tích --- nhưng gần $90\%$ của $\varepsilon_{L^2}$ nay đến từ vùng
-\emph{trơn}, nơi sai số trải đều ở mức $10^{-4}$ (Hình~\ref{fig:tn10}(b)).
+\textbf{Kết quả 3: sai số vẫn đậm đặc nhất ở lớp sốc, nhưng chỉ còn khoảng một
+nửa sai số $L^2$ nằm ở đó.} Tỉ số $\varepsilon_{L^\infty}/\varepsilon_{L^2}$ gần
+như không đổi --- khoảng $15$ ở Mục~\ref{sec:tn5}, khoảng $13$ ở TN10 --- và ở
+\emph{cả năm} hạt giống, điểm sai số lớn nhất nằm trong dải $\abs{x} < 0{,}02$
+sau thời điểm hình thành sốc $t_b = 1/\pi$. Dải ấy chỉ chiếm $1{,}4\%$ diện tích
+miền nhưng chứa trung vị $51\%$ tổng bình phương sai số, khoảng
+$[12\%;\ 63\%]$ --- tức đậm đặc gấp khoảng $36$ lần mức trung bình. Ngoài dải,
+sai số lớn nhất có trung vị $1{,}64\times10^{-3}$ và sai số điển hình (trung vị
+theo điểm) chỉ $1{,}4\times10^{-4}$.
 
-Hệ quả thực hành: muốn hạ $\varepsilon_{L^2}$ thêm nữa, việc cần làm không còn
-chủ yếu là xử lý lớp sốc. Mức nền $10^{-4}$ trên vùng trơn là giới hạn của tối
-ưu hoá hoặc của khả năng xấp xỉ trên \emph{toàn} miền --- một chế độ khác với
-chế độ mà Bảng~\ref{tab:ba-nguyen-nhan} mô tả cho TN5.
+Khoảng $[12\%;\ 63\%]$ rộng, và cần nói rõ rằng hạt giống trung vị theo
+$\varepsilon_{L^2}$ --- hạt giống $1$, vẽ ở Hình~\ref{fig:tn10}(b) --- lại chính
+là hạt giống có phần trong dải \emph{nhỏ nhất}; hình ấy vì vậy cho ấn tượng sai
+số trải đều hơn thực tế. Kết luận đọc được trên cả năm hạt giống là: sau TN10,
+$\varepsilon_{L^2}$ đến từ hai nguồn có độ lớn cùng bậc --- lớp sốc và mức nền
+$10^{-4}$ trên vùng trơn --- nên muốn hạ nó thêm phải xử lý \emph{cả hai}, không
+chỉ lớp sốc như bức tranh của TN5 gợi ý.
 
 \begin{nhanxet}[Không được quy công cho RAR]
 \label{nx:khong-quy-cong-rar}
@@ -1864,10 +1863,9 @@ Quá trình cũng không đơn điệu: hạt giống $0$ tăng sai số ở đ�
 không mâu thuẫn gì: L-BFGS cực tiểu hoá $J$, không cực tiểu hoá
 $\varepsilon_{L^2}$, và mỗi lần thêm điểm RAR là thay đổi chính hàm $J$.
 
-Vì vậy, hạn chế~(4) ở Mục~\ref{sec:hanche} chỉ được giải quyết một nửa: RAR đã
-được \emph{dùng}, nhưng vai trò riêng của nó vẫn chưa được \emph{đo}. Muốn đo
-cần một thí nghiệm tách biến --- cùng cấu hình TN10, bỏ RAR, cùng số đợt L-BFGS
---- trên năm hạt giống.
+Câu hỏi còn lại --- trong hệ số $2{,}4$ của năm đợt sau, bao nhiêu là của RAR
+--- được trả lời bằng thí nghiệm tách biến ở
+Mục~\ref{subsec:tn10-tachbien}: rất ít, và không nhất quán giữa các hạt giống.
 \end{nhanxet}
 
 \textbf{Kết quả 4: chi phí --- khoảng cách với sai phân hữu hạn vẫn bốn bậc.}
@@ -1927,6 +1925,108 @@ Kết luận của Nhận xét~\ref{nx:doc-tn9} vì vậy được củng cố c
 lay: TN10 chứng minh rằng PINN \emph{có thể} đạt độ chính xác cao trên bài toán
 cứng này, nhưng không làm nó rẻ hơn. Giá trị của phương pháp vẫn phải được biện
 minh ở ba động lực của Mục~\ref{subsec:gioi-han-co-dien}.
+
+\subsection{Tách biến: vai trò riêng của RAR}
+\label{subsec:tn10-tachbien}
+
+\textbf{Thiết kế.} Giữ nguyên \emph{mọi thứ} của TN10 và chỉ đổi cách thêm điểm
+phối trí. Ba nhánh rẽ ra từ \emph{cùng} một trạng thái --- trọng số và tập điểm
+sau Adam và đợt L-BFGS thứ nhất, đúng thời điểm RAR bắt đầu can thiệp --- nên
+khác biệt giữa chúng chỉ đến từ năm đợt L-BFGS sau:
+\begin{itemize}[leftmargin=2.2em,itemsep=2pt]
+\item \emph{RAR}: như TN10, sau đợt $1$--$3$ thêm $500$ điểm có $\abs{r}$ lớn
+  nhất trong $20\,000$ ứng viên;
+\item \emph{ngẫu nhiên}: sau đợt $1$--$3$ thêm $500$ điểm rải \emph{đều} ---
+  cùng \emph{số} điểm như RAR, chỉ khác \emph{vị trí}, để tách ``thích nghi''
+  khỏi ``nhiều điểm hơn'';
+\item \emph{không thêm}: $N_r = 10\,000$ tới hết.
+\end{itemize}
+Nhánh RAR là một phép kiểm chứng: nó phải cho lại đúng TN10. Trên cả năm hạt
+giống, $\varepsilon_{L^2}$ cuối của nhánh này trùng TN10 \emph{từng bit}.
+
+\begin{table}[H]
+\centering
+\caption[Tách biến vai trò của RAR]{Thí nghiệm tách biến trên năm hạt giống:
+trung vị và khoảng. Cột ``thắng'' đếm số hạt giống mà RAR tốt hơn nhánh ấy
+\emph{trên cùng hạt giống}. Dải sốc là $\abs{x} < 0{,}02$, $t > 1/\pi$, chiếm
+$1{,}4\%$ diện tích miền.}
+\label{tab:tn10b}
+\footnotesize
+\begin{tabular}{@{}l l l l@{}}
+\toprule
+& \textbf{không thêm} & \textbf{ngẫu nhiên} & \textbf{RAR} \\
+\midrule
+$\varepsilon_{L^2}$ & $7{,}18\times10^{-4}$ & $8{,}22\times10^{-4}$
+  & $\mathbf{6{,}48\times10^{-4}}$ \\
+\quad khoảng ($\times10^{-4}$) & $[3{,}84;\ 13{,}2]$ & $[3{,}54;\ 15{,}8]$
+  & $[3{,}85;\ 8{,}33]$ \\
+\quad RAR thắng & $3/5$ & $4/5$ & --- \\
+\addlinespace
+$\max\abs{u_{\btheta} - u}$ & $9{,}75\times10^{-3}$ & $1{,}28\times10^{-2}$
+  & $\mathbf{8{,}51\times10^{-3}}$ \\
+\quad RAR thắng & $4/5$ & $4/5$ & --- \\
+\addlinespace
+\% bình phương sai số trong dải & $79\%$ & $84\%$ & $\mathbf{51\%}$ \\
+sai số điển hình ngoài dải & $\mathbf{1{,}0\times10^{-4}}$ & $1{,}2\times10^{-4}$
+  & $1{,}4\times10^{-4}$ \\
+điểm thêm nằm trong dải & --- & $1\%$ & $24\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Images/chap_5/fig58_tn10b.pdf}
+\caption[Tách biến RAR theo từng hạt giống]{Tách biến vai trò của RAR. Mỗi đường
+nối ba nhánh của \emph{cùng} một hạt giống. (a) Với $\varepsilon_{L^2}$, các
+đường cắt nhau: không nhánh nào thắng nhất quán. (b) Với sai số lớn nhất, RAR
+thắng ở bốn trên năm hạt giống. (c) RAR kéo phần sai số nằm trong dải sốc từ
+khoảng $80\%$ xuống khoảng $50\%$.}
+\label{fig:tn10b}
+\end{figure}
+
+\textbf{Kết quả (a): trên sai số toàn cục, đóng góp của RAR nhỏ và không nhất
+quán.} Trung vị $\varepsilon_{L^2}$ của RAR tốt hơn nhánh không thêm điểm
+$1{,}11$ lần, nhưng xét theo từng hạt giống thì RAR chỉ thắng ba trên năm, với
+tỉ số trải từ $0{,}66$ tới $1{,}86$ (Hình~\ref{fig:tn10b}(a)). Với $n = 5$, ba
+trên năm không phân biệt được với may rủi. Ghép với
+Bảng~\ref{tab:tn10-ketqua}, mức cải thiện $213$ lần của TN10 nay tách được
+thành ba phần theo thang logarit: khoảng $83\%$ đến trước khi có điểm RAR nào
+(mạng, $N_r$, đợt L-BFGS đầu), khoảng $15\%$ từ năm đợt L-BFGS tiếp theo
+\emph{không cần} thêm điểm nào ($1{,}58\times10^{-3} \to 7{,}18\times10^{-4}$),
+và chỉ khoảng $2\%$ còn lại có thể quy cho RAR. Nhánh RAR cũng không được lợi
+thế nhờ tính toán nhiều hơn: nó dùng $16\,600$--$16\,800$ lần đánh giá hàm mục
+tiêu, ít hơn hai nhánh kia ($17\,100$--$17\,400$).
+
+\textbf{Kết quả (b): số lượng điểm không phải là yếu tố.} Thêm $1\,500$ điểm
+ngẫu nhiên không tốt hơn không thêm gì --- nhánh không thêm thắng ba trên năm,
+và trung vị của nó còn thấp hơn. Vậy nếu RAR có tác dụng thì tác dụng ấy đến từ
+\emph{vị trí} điểm, không phải từ việc có thêm điểm.
+
+\textbf{Kết quả (c): tác dụng thật của RAR là cục bộ, và có giá.} RAR đặt trung
+vị $24\%$ số điểm mới vào dải sốc --- nơi chỉ chiếm $1{,}4\%$ diện tích, tức lấy
+mẫu dày gấp khoảng $17$ lần --- và kết quả hiện đúng ở đó: sai số lớn nhất, vốn
+luôn nằm trong dải, giảm ở bốn trên năm hạt giống; phần bình phương sai số trong
+dải giảm từ khoảng $80\%$ xuống $51\%$. Nhưng sai số điển hình \emph{ngoài} dải
+lại tăng nhẹ, từ $1{,}0\times10^{-4}$ lên $1{,}4\times10^{-4}$: dồn điểm vào lớp
+sốc làm hàm mục tiêu ``chú ý'' ít hơn tới vùng trơn. Hai tác động gần như triệt
+tiêu nhau trong $\varepsilon_{L^2}$, và đó chính là lý do Kết quả (a) nhỏ.
+
+\begin{nhanxet}[RAR là công cụ cho sai số cục bộ, không cho sai số toàn cục]
+\label{nx:rar-cuc-bo}
+Hạn chế~(4) ở Mục~\ref{sec:hanche} dự báo RAR là ``kỹ thuật có khả năng cải
+thiện rõ nhất'' cho Burgers. Tách biến cho thấy dự báo ấy chỉ đúng một nửa, và
+đúng ở đại lượng khác với đại lượng mà báo cáo dùng để chấm điểm: RAR cải thiện
+nhất quán \emph{sai số lớn nhất} tại lớp sốc, nhưng gần như không đổi
+$\varepsilon_{L^2}$, vì cái được ở lớp sốc bị trả lại ở vùng trơn. Mức cải
+thiện $213$ lần của TN10 vì vậy phải được quy cho cấu hình mạng, số điểm phối trí
+và độ dài L-BFGS, không cho RAR.
+
+Kết luận này có phạm vi hẹp: một lịch RAR duy nhất ($500$ điểm sau mỗi đợt
+$1$--$3$), điểm cũ được giữ nguyên, và $n = 5$. Các biến thể lấy mẫu lại toàn bộ
+tập điểm theo phân phối tỉ lệ với $\abs{r}$ --- vốn giữ được mật độ điểm trên
+vùng trơn --- có thể tránh được sự đánh đổi ở Kết quả (c), và chưa được thử.
+\end{nhanxet}
 
 %==============================================================================
 \section{Đối chiếu lý thuyết và thực nghiệm}
@@ -2136,12 +2236,14 @@ chứng \emph{định tính} về thứ tự học, không phải kiểm chứng
 Đây cũng là lý do ta không rút kết luận số từ đối chiếu $38{,}6$ với $64$ ở
 Mục~\ref{sec:tn3}.
  
-\item \emph{Chưa khảo sát độ nhạy theo cách lấy mẫu.} Lấy mẫu siêu khối Latin ở
-Bảng~\ref{tab:remedies} chưa được thử. Lấy mẫu thích nghi RAR đã được \emph{dùng}
-ở Mục~\ref{sec:tn10}, nhưng cùng lúc với ba thay đổi khác, và
-Nhận xét~\ref{nx:khong-quy-cong-rar} chỉ ra rằng phần lớn cải thiện đến trước
-khi có điểm RAR nào. Vai trò riêng của RAR vì vậy vẫn chưa được đo; muốn đo cần
-một thí nghiệm tách biến trên cùng cấu hình.
+\item \emph{Khảo sát độ nhạy theo cách lấy mẫu còn hẹp.} Lấy mẫu siêu khối Latin
+ở Bảng~\ref{tab:remedies} chưa được thử. Lấy mẫu thích nghi RAR đã được đo riêng
+bằng thí nghiệm tách biến ở Mục~\ref{subsec:tn10-tachbien}, và kết quả trái với
+dự báo ban đầu của chính mục này: RAR \emph{không} phải kỹ thuật cải thiện rõ
+nhất cho $\varepsilon_{L^2}$ --- đóng góp của nó nhỏ và không nhất quán --- mà
+là công cụ cho sai số \emph{cục bộ} tại lớp sốc
+(Nhận xét~\ref{nx:rar-cuc-bo}). Hạn chế còn lại là chỉ một lịch RAR được thử;
+các biến thể lấy mẫu lại toàn bộ theo $\abs{r}$ chưa được đo.
  
 \item \emph{Nghiệm tham chiếu cho Burgers là nghiệm số.} Dù đã kiểm chứng hội tụ
 lưới ($2{,}31\times10^{-4}$), đây vẫn không phải nghiệm giải tích, nên kết luận về
@@ -2288,9 +2390,11 @@ dự báo: áp dụng cấu hình của công trình gốc cùng lấy mẫu th�
 Burgers. Sai số trung vị giảm $213$ lần, xuống $6{,}48\times10^{-4}$ --- cùng bậc
 với công trình gốc --- và độ phân tán giữa hạt giống co từ $26{,}4$ về $2{,}2$.
 Nhưng kết quả tích cực nhất chương này cũng được đọc với cùng sự dè dặt như các
-kết quả tiêu cực: nó không quy được cho riêng RAR
-(Nhận xét~\ref{nx:khong-quy-cong-rar}), và nó chỉ thu hẹp khoảng cách chi phí
-$1{,}6$ lần --- vẫn bốn bậc độ lớn.
+kết quả tiêu cực. Thí nghiệm tách biến cho thấy lấy mẫu thích nghi --- biện pháp
+mà báo cáo kỳ vọng nhiều nhất --- chỉ đóng góp khoảng $2\%$ (thang logarit) của
+mức cải thiện, và không nhất quán giữa các hạt giống; tác dụng thật của nó là
+cục bộ tại lớp sốc (Nhận xét~\ref{nx:rar-cuc-bo}). Và kết quả ấy chỉ thu hẹp
+khoảng cách chi phí $1{,}6$ lần --- vẫn bốn bậc độ lớn.
 
 Hai kết quả cuối cùng ấy minh hoạ đúng vai trò của chương: bước kiểm chứng số không
 chỉ xác nhận hay bác bỏ lý thuyết đã có, mà còn chỉ ra chỗ lý thuyết cần được bổ
