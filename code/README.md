@@ -43,6 +43,16 @@ for s in 0 1 2 3 4; do python -m pinns.exp10b_rar_tachbien $s & done; wait
 python -m pinns.exp10b_rar_tachbien tong_ket
 ```
 
+**TN10c** thử biến thể lấy mẫu lại toàn bộ (RAD, Wu và cs. 2023):
+`p(x) ∝ |r|^k / mean(|r|^k) + c`, hai nhánh `c = 1` (giữ mật độ vùng trơn) và
+`c = 0`, rẽ từ cùng trạng thái như TN10b. Giả thuyết và tiêu chí thành bại được
+ghi ở đầu `exp10c_rad.py` **trước khi chạy**; `tong_ket` in DAT / KHONG DAT.
+
+```bash
+for s in 0 1 2 3 4; do python -m pinns.exp10c_rad $s & done; wait
+python -m pinns.exp10c_rad tong_ket
+```
+
 Mỗi hạt giống ghi `results/exp10_seed<s>.json` (số liệu), `exp10_trongso_seed<s>.pt`
 (trọng số cuối, `float64`) và `exp10_anh_seed<s>.npz` (ảnh chụp `float16` cho
 hoạt hình — không đưa vào git). Ảnh chụp `float16` chỉ dùng để vẽ `u`; mọi hình

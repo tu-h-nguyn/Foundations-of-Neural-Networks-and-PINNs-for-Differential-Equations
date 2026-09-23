@@ -14,6 +14,7 @@ MODULES = [
     ("TN9  chi phi tinh toan thuc do",   "pinns.exp9_chiphi"),
     ("TN10 Burgers, cau hinh manh",      "pinns.exp10_burgers_manh"),
     ("TN10b tach bien RAR",              "pinns.exp10b_rar_tachbien"),
+    ("TN10c RAD, lay mau lai toan bo",   "pinns.exp10c_rad"),
 ]
 
 
