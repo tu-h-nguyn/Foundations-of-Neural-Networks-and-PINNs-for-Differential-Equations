@@ -20,7 +20,7 @@ quả tiêu cực được phân tích đúng nguyên nhân có giá trị ngang
  
 Cấu trúc chương: Mục~\ref{sec:trienkhai} mô tả kiến trúc cài đặt trên
 PyTorch~\cite{paszke2019} và cấu hình chung. Các
-Mục~\ref{sec:tn1}--\ref{sec:tn9} trình bày chín thí nghiệm.
+Mục~\ref{sec:tn1}--\ref{sec:tn10} trình bày mười thí nghiệm.
 Mục~\ref{sec:doi-chieu} đối chiếu toàn bộ lý thuyết với số liệu, và
 Mục~\ref{sec:hanche} nêu thẳng những hạn chế của thiết kế thực nghiệm này.
  
@@ -1720,6 +1720,215 @@ Mục~\ref{subsec:gioi-han-co-dien}, không bằng chi phí.} Mọi thí nghiệ
 \end{nhanxet}
 
 %==============================================================================
+\section{Thí nghiệm 10: áp dụng chính các biện pháp khắc phục}
+\label{sec:tn10}
+%==============================================================================
+
+\begin{thinghiem}[Sai số Burgers là giới hạn của phương pháp hay của ngân sách?]
+\label{tn:tangcuong}
+Mục~\ref{sec:tn5} và Mục~\ref{sec:tn8} cho sai số Burgers trung vị
+$1{,}38\times10^{-1}$, và Mục~\ref{sec:hanche} tự đưa ra hai lời giải thích: ngân
+sách huấn luyện hạn chế (hạn chế~(2)) và việc chưa thử lấy mẫu thích nghi RAR,
+``kỹ thuật có khả năng cải thiện rõ nhất'' (hạn chế~(4)). Hai lời giải thích ấy
+là \emph{dự báo}, và dự báo thì phải được kiểm. Thí nghiệm này áp dụng đúng
+những gì báo cáo đã đề xuất, rồi hỏi: \emph{sai số giảm bao nhiêu, và với cái giá
+nào?} Tiêu chí đặt trước: nếu trung vị trên năm hạt giống không xuống dưới
+$10^{-2}$ thì lời giải thích ``do ngân sách'' bị bác bỏ.
+\end{thinghiem}
+
+\textbf{Thiết lập.} Bài toán, nghiệm tham chiếu và chỉ tiêu sai số giữ nguyên
+như Mục~\ref{sec:tn5}, nên hai cột của Bảng~\ref{tab:tn10-thietlap} so sánh trực
+tiếp được. Bốn thứ thay đổi:
+
+\begin{table}[H]
+\centering
+\caption[Thiết lập TN5 so với TN10]{Thiết lập của TN5 (cấu hình trọng số cố
+định, như ở Mục~\ref{sec:tn8}) và của TN10. Những dòng không liệt kê --- hàm mục
+tiêu với $\lambda_b = \lambda_0 = 1$, khởi tạo Xavier, \texttt{float64},
+\texttt{OMP\_NUM\_THREADS=1}, $N_b = N_0 = 300$ --- giống hệt nhau.}
+\label{tab:tn10-thietlap}
+\small
+\begin{tabular}{@{}l l p{6.2cm}@{}}
+\toprule
+& \textbf{TN5} & \textbf{TN10} \\
+\midrule
+Mạng & $4$ lớp ẩn $\times\,32$, $P = 3\,297$
+  & $8$ lớp ẩn $\times\,20$, $P = 3\,021$ \\
+Điểm phối trí & $N_r = 2\,500$, cố định
+  & $N_r = 10\,000$, cộng $1\,500$ điểm RAR \\
+Adam ($\eta = 10^{-3}$) & $6\,000$ vòng & $3\,000$ vòng \\
+L-BFGS & $800$ vòng & $6$ đợt, mỗi đợt tối đa $2\,000$ vòng \\
+RAR & --- & sau mỗi đợt $1$--$3$: thêm $500$ điểm có $\abs{r}$ lớn nhất
+  trong $20\,000$ ứng viên ngẫu nhiên \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Kiến trúc tám lớp ẩn, hai mươi nơ-ron và $N_r = 10\,000$ là đúng cấu hình của
+công trình gốc~\cite{raissi2019} cho bài toán này. Số tham số của hai mạng gần
+bằng nhau ($3\,021$ so với $3\,297$), nên khác biệt nằm ở \emph{độ sâu}, không ở
+kích thước. Tổng cộng mỗi lần chạy đánh giá hàm mục tiêu khoảng $16\,800$ lần,
+trong đó $13\,600$ lần thuộc giai đoạn L-BFGS.
+
+\begin{table}[H]
+\centering
+\caption[Sai số TN10 theo từng giai đoạn huấn luyện]{Sai số $\varepsilon_{L^2}$
+của TN10 theo giai đoạn, trung vị và khoảng trên năm hạt giống. Hàng TN5 lấy từ
+Bảng~\ref{tab:tn8-eps}.}
+\label{tab:tn10-ketqua}
+\small
+\begin{tabular}{@{}l r l r@{}}
+\toprule
+\textbf{Thời điểm} & \textbf{trung vị} & \textbf{khoảng} & \textbf{so với TN5} \\
+\midrule
+TN5, cuối & $1{,}38\times10^{-1}$
+  & $[7{,}93\times10^{-3};\ 2{,}09\times10^{-1}]$ & $1$ \\
+\addlinespace
+TN10, sau Adam & $6{,}18\times10^{-2}$
+  & $[4{,}04\times10^{-2};\ 8{,}49\times10^{-1}]$ & $2{,}2$ \\
+TN10, đợt L-BFGS 1 (chưa RAR) & $1{,}58\times10^{-3}$
+  & $[1{,}44;\ 4{,}28]\times10^{-3}$ & $87$ \\
+TN10, đợt 3 ($1\,000$ điểm RAR) & $8{,}96\times10^{-4}$
+  & $[4{,}98;\ 10{,}8]\times10^{-4}$ & $154$ \\
+TN10, cuối ($1\,500$ điểm RAR) & $\mathbf{6{,}48\times10^{-4}}$
+  & $[3{,}85;\ 8{,}33]\times10^{-4}$ & $\mathbf{213}$ \\
+\midrule
+TN10, $\varepsilon_{L^\infty}$ cuối & $8{,}51\times10^{-3}$
+  & $[3{,}42;\ 10{,}8]\times10^{-3}$ & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Images/chap_5/fig57_tn10.pdf}
+\caption[Hội tụ của TN10 trên năm hạt giống]{Thí nghiệm~\ref{tn:tangcuong}.
+(a) Sai số $\varepsilon_{L^2}$ theo số lần đánh giá hàm mục tiêu, cả năm hạt
+giống; đường xanh là hạt giống \emph{trung vị}, không phải hạt giống tốt nhất.
+Đường cam là trung vị của TN5. (b) Sai số tuyệt đối $\abs{u_{\btheta} - u}$ của
+hạt giống trung vị, thang logarit, tính lại ở độ chính xác kép từ trọng số đã
+lưu.}
+\label{fig:tn10}
+\end{figure}
+
+\textbf{Kết quả 1: lời giải thích ``do ngân sách'' đứng vững, và với biên độ
+lớn.} Trung vị giảm từ $1{,}38\times10^{-1}$ xuống $6{,}48\times10^{-4}$ ---
+\emph{hai trăm mười ba lần}. Hạt giống \emph{tệ nhất} của TN10
+($8{,}33\times10^{-4}$) vẫn tốt hơn hạt giống \emph{tốt nhất} của TN5
+($7{,}93\times10^{-3}$) gần mười lần; hai khoảng cách nhau hơn một bậc độ lớn.
+Kết quả nằm cùng bậc với $6{,}7\times10^{-4}$ mà công trình gốc~\cite{raissi2019}
+báo cáo cho cùng kiến trúc --- tuy đó là một lần chạy, đo so với một nghiệm tham
+chiếu khác, nên ta chỉ khẳng định \emph{cùng bậc} chứ không so từng chữ số. Tiêu
+chí đặt trước ($< 10^{-2}$) đạt với dư hơn một bậc.
+
+\textbf{Kết quả 2: độ phân tán giữa các hạt giống co lại.} Hệ số max/min giảm từ
+$26{,}4$ ở TN5 xuống $2{,}2$ --- ngang mức của bài toán khuếch tán
+(Bảng~\ref{tab:tn8-eps}). Điều Mục~\ref{sec:tn8} ghi nhận là ``trên Burgers,
+ngưỡng đọc số phải là một bậc độ lớn'' hoá ra là đặc điểm của \emph{chế độ huấn
+luyện chưa hội tụ}, không phải của bài toán: khi tối ưu hoá đi đủ xa, các hạt
+giống hội tụ về cùng một mức.
+
+\textbf{Kết quả 3: sai số lớn nhất vẫn ở lớp sốc, nhưng phần lớn sai số $L^2$
+thì không còn ở đó.} Tỉ số $\varepsilon_{L^\infty}/\varepsilon_{L^2}$ gần như
+không đổi --- khoảng $15$ ở Mục~\ref{sec:tn5}, khoảng $13$ ở TN10 --- và điểm
+sai số lớn nhất của hạt giống trung vị,
+$\abs{u_{\btheta} - u} = 5{,}64\times10^{-3}$, nằm tại $x \approx 0{,}002$,
+$t = 0{,}45$: ngay trong lớp sốc. Nhưng một phép đếm trực tiếp trên lưới đánh giá
+cho bức tranh khác với cách đọc ở Mục~\ref{sec:tn5}. Dải $\abs{x} < 0{,}02$ sau
+thời điểm hình thành sốc $t_b = 1/\pi$ chiếm $1{,}4\%$ diện tích miền nhưng chỉ
+chứa $12{,}4\%$ tổng bình phương sai số; ngoài dải ấy, sai số lớn nhất là
+$1{,}64\times10^{-3}$ và trung vị là $2{,}2\times10^{-4}$. Nói cách khác, lớp sốc
+vẫn là nơi sai số \emph{đậm đặc} nhất --- gấp khoảng chín lần mức trung bình
+theo diện tích --- nhưng gần $90\%$ của $\varepsilon_{L^2}$ nay đến từ vùng
+\emph{trơn}, nơi sai số trải đều ở mức $10^{-4}$ (Hình~\ref{fig:tn10}(b)).
+
+Hệ quả thực hành: muốn hạ $\varepsilon_{L^2}$ thêm nữa, việc cần làm không còn
+chủ yếu là xử lý lớp sốc. Mức nền $10^{-4}$ trên vùng trơn là giới hạn của tối
+ưu hoá hoặc của khả năng xấp xỉ trên \emph{toàn} miền --- một chế độ khác với
+chế độ mà Bảng~\ref{tab:ba-nguyen-nhan} mô tả cho TN5.
+
+\begin{nhanxet}[Không được quy công cho RAR]
+\label{nx:khong-quy-cong-rar}
+TN10 đổi \emph{bốn} thứ cùng lúc, nên không thể tách đóng góp của từng thứ. Số
+liệu theo giai đoạn ở Bảng~\ref{tab:tn10-ketqua} còn chỉ ra một điều cụ thể hơn:
+\emph{phần lớn} cải thiện đến \emph{trước} khi có bất kỳ điểm RAR nào. Sau đợt
+L-BFGS thứ nhất --- mạng sâu hơn, $N_r = 10\,000$, chưa một điểm thích nghi ---
+trung vị đã tốt hơn TN5 $87$ lần; tính theo thang logarit, đó là khoảng $83\%$
+của toàn bộ mức cải thiện $213$ lần. Năm đợt còn lại chỉ thêm hệ số $2{,}4$, và
+hệ số ấy \emph{cũng} không quy được cho RAR, vì năm đợt ấy đồng thời là năm đợt
+L-BFGS nữa.
+
+Quá trình cũng không đơn điệu: hạt giống $0$ tăng sai số ở đợt thứ ba
+($9{,}83\times10^{-4} \to 1{,}08\times10^{-3}$) và hạt giống $1$ ở đợt thứ tư
+($9{,}80\times10^{-4} \to 1{,}51\times10^{-3}$), trước khi giảm lại. Điều này
+không mâu thuẫn gì: L-BFGS cực tiểu hoá $J$, không cực tiểu hoá
+$\varepsilon_{L^2}$, và mỗi lần thêm điểm RAR là thay đổi chính hàm $J$.
+
+Vì vậy, hạn chế~(4) ở Mục~\ref{sec:hanche} chỉ được giải quyết một nửa: RAR đã
+được \emph{dùng}, nhưng vai trò riêng của nó vẫn chưa được \emph{đo}. Muốn đo
+cần một thí nghiệm tách biến --- cùng cấu hình TN10, bỏ RAR, cùng số đợt L-BFGS
+--- trên năm hạt giống.
+\end{nhanxet}
+
+\textbf{Kết quả 4: chi phí --- khoảng cách với sai phân hữu hạn vẫn bốn bậc.}
+Mục~\ref{sec:tn9} đo được PINN chậm hơn sai phân hữu hạn $1{,}8\times10^{4}$
+lần ở mức sai số của TN5. Câu hỏi tự nhiên là khoảng cách ấy có thu hẹp khi đòi
+hỏi độ chính xác cao hơn hay không. Ta lặp đúng quy trình của Mục~\ref{sec:tn9}:
+với mỗi $N_x \in \{63, 127, 255, 511, 1\,023\}$ chọn bước thời gian \emph{lớn
+nhất} vẫn nhỏ hơn một nửa chặn ổn định của chính lưới ấy, và dừng ở lưới thô
+nhất đạt sai số $\le 6{,}48\times10^{-4}$.
+
+\begin{table}[H]
+\centering
+\caption[Chi phí TN10 so với sai phân hữu hạn]{Chi phí để đạt mức sai số của
+TN10. Thời gian sai phân là trung vị ba lần chạy.}
+\label{tab:tn10-chiphi}
+\small
+\begin{tabular}{@{}l r r r@{}}
+\toprule
+\textbf{Phương pháp} & $\Delta t$ & \textbf{Thời gian} & $\varepsilon_{L^2}$ \\
+\midrule
+PINN, TN10, hạt giống trung vị, chạy riêng một lõi
+  & --- & $38{,}7$ phút & $6{,}48\times10^{-4}$ \\
+\addlinespace
+Sai phân, $N_x = 511$ & $1\times10^{-3}$ & $0{,}044$ s & $2{,}65\times10^{-3}$ \\
+Sai phân, $N_x = 1\,023$ & $2{,}5\times10^{-4}$ & $0{,}21$ s
+  & $6{,}14\times10^{-4}$ \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\emph{PINN chậm hơn khoảng $1{,}1\times10^{4}$ lần ở cùng mức
+sai số.}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Tỉ số giảm từ $1{,}8\times10^{4}$ ở Mục~\ref{sec:tn9} xuống $1{,}1\times10^{4}$
+--- thu hẹp khoảng $1{,}6$ lần, nhưng vẫn \emph{bốn} bậc độ lớn. Lý do đọc được
+ngay từ hai bảng: để giảm sai số từ mức TN5 xuống mức TN10, PINN tốn thêm khoảng
+$14$ lần thời gian ($170$ s $\to$ $38{,}7$ phút), còn sai phân hữu hạn tốn thêm
+khoảng $21$ lần ($0{,}0098$ s $\to$ $0{,}21$ s). Hai phương pháp trả giá cho độ
+chính xác theo những tỉ lệ \emph{gần nhau}, nên khoảng cách về bậc giữ nguyên;
+muốn tỉ số đổi bậc thì chi phí của sai phân phải tăng nhanh hơn hẳn chi phí của
+PINN, điều mà ở $d = 1$ không xảy ra.
+
+Hai lưu ý để con số được đọc đúng. \emph{Thứ nhất}, năm hạt giống được chạy song
+song trên bốn lõi, nên thời gian $51$ phút ghi trong nhật ký bị kéo dài bởi
+tranh chấp CPU; con số trong bảng lấy từ một lần chạy lại hạt giống trung vị
+\emph{một mình}. Lần chạy lại ấy cho lại kết quả giống \emph{từng bit} ---
+$\varepsilon_{L^2}$, $\varepsilon_{L^\infty}$, số lần đánh giá, và cả $168$ điểm
+trên đường sai số --- một kiểm chứng trực tiếp cho quy ước tái lập ở
+Mục~\ref{sec:hanche}, hạn chế~(7).
+\emph{Thứ hai}, sai số của lưới sai phân được đo so với nghiệm tham chiếu của
+\emph{cùng} lược đồ trên lưới mịn hơn, nên sai số rời rạc hoá của hai lưới có
+tương quan và phép đo có thể hơi lạc quan cho sai phân. Nhưng ngay cả khi phải
+lên tới chính lưới tham chiếu $N_x = 2\,047$ --- chạy trong $2{,}1$ giây ---
+tỉ số vẫn ở bậc $10^{3}$.
+
+Kết luận của Nhận xét~\ref{nx:doc-tn9} vì vậy được củng cố chứ không bị lung
+lay: TN10 chứng minh rằng PINN \emph{có thể} đạt độ chính xác cao trên bài toán
+cứng này, nhưng không làm nó rẻ hơn. Giá trị của phương pháp vẫn phải được biện
+minh ở ba động lực của Mục~\ref{subsec:gioi-han-co-dien}.
+
+%==============================================================================
 \section{Đối chiếu lý thuyết và thực nghiệm}
 \label{sec:doi-chieu}
 %==============================================================================
@@ -1908,12 +2117,16 @@ chúng: mỗi ô số liệu nên là ``trung vị $[\min;\max]$'' ngay tại ch
 giữ cách trình bày hiện tại để mỗi mục còn đọc được độc lập, nhưng người đọc cần
 mang Mục~\ref{sec:tn8} theo khi đọc mọi con số ở các mục trước.
  
-\item \emph{Ngân sách huấn luyện hạn chế.} Toàn bộ thí nghiệm chạy trên một lõi
-CPU, với $4\,000$--$8\,000$ vòng Adam, so với bậc $10^5$ vòng thường dùng trong
-các công trình gốc~\cite{raissi2019}. Sai số Burgers $2{,}84\times10^{-2}$ vì vậy
-\emph{không} phản ánh giới hạn của phương pháp PINN mà phản ánh giới hạn của ngân
-sách; các công trình gốc báo cáo bậc $10^{-3}$--$10^{-4}$ trên cùng bài toán với
-mạng lớn hơn và huấn luyện lâu hơn.
+\item \emph{Ngân sách huấn luyện hạn chế --- đã kiểm, cho Burgers.} TN1--TN9
+chạy trên một lõi CPU với $4\,000$--$8\,000$ vòng Adam, so với bậc $10^5$ vòng
+thường dùng trong các công trình gốc~\cite{raissi2019}, nên sai số Burgers của
+Mục~\ref{sec:tn5} được đọc là giới hạn của \emph{ngân sách} chứ không của
+phương pháp. Mục~\ref{sec:tn10} đã kiểm dự báo này và xác nhận nó: với cấu hình
+của công trình gốc và L-BFGS dài hơn, trung vị giảm $213$ lần, xuống
+$6{,}48\times10^{-4}$. Hạn chế còn lại là các thí nghiệm \emph{khác} --- đặc biệt
+các số đo $\rho_b$ và độ phân tán ở TN5, TN8 --- vẫn được đo ở ngân sách nhỏ, và
+Mục~\ref{sec:tn10} cho thấy ít nhất độ phân tán giữa hạt giống thay đổi hẳn khi
+ngân sách tăng.
  
 \item \emph{Mạng nhỏ.} Kiến trúc $2\,209$--$8\,513$ tham số nhỏ hơn đáng kể so với
 chuẩn mực trong tài liệu. Nói riêng, lập luận NTK ở Nhận xét~\ref{rem:ntk-view}
@@ -1923,12 +2136,12 @@ chứng \emph{định tính} về thứ tự học, không phải kiểm chứng
 Đây cũng là lý do ta không rút kết luận số từ đối chiếu $38{,}6$ với $64$ ở
 Mục~\ref{sec:tn3}.
  
-\item \emph{Chưa khảo sát độ nhạy theo cách lấy mẫu.} Cả lấy mẫu siêu khối Latin
-lẫn lấy mẫu thích nghi RAR ở Bảng~\ref{tab:remedies} đều chưa được kiểm chứng.
-Riêng với bài toán Burgers ở Mục~\ref{sec:tn5}, nơi sai số tập trung vào một
-dải hẹp quanh
-$x = 0$, RAR là kỹ thuật có khả năng cải thiện rõ nhất và đáng được thử trước
-tiên.
+\item \emph{Chưa khảo sát độ nhạy theo cách lấy mẫu.} Lấy mẫu siêu khối Latin ở
+Bảng~\ref{tab:remedies} chưa được thử. Lấy mẫu thích nghi RAR đã được \emph{dùng}
+ở Mục~\ref{sec:tn10}, nhưng cùng lúc với ba thay đổi khác, và
+Nhận xét~\ref{nx:khong-quy-cong-rar} chỉ ra rằng phần lớn cải thiện đến trước
+khi có điểm RAR nào. Vai trò riêng của RAR vì vậy vẫn chưa được đo; muốn đo cần
+một thí nghiệm tách biến trên cùng cấu hình.
  
 \item \emph{Nghiệm tham chiếu cho Burgers là nghiệm số.} Dù đã kiểm chứng hội tụ
 lưới ($2{,}31\times10^{-4}$), đây vẫn không phải nghiệm giải tích, nên kết luận về
@@ -2070,7 +2283,16 @@ cho con số bất lợi nhất của báo cáo: PINN chậm hơn sai phân hữ
 bậc độ lớn ở cùng mức sai số, trên đúng lớp bài toán mà cả ba động lực của
 Mục~\ref{subsec:gioi-han-co-dien} đều vắng mặt.
 
-Kết quả cuối cùng ấy minh hoạ đúng vai trò của chương: bước kiểm chứng số không
+Mục~\ref{sec:tn10} khép lại chương bằng cách làm đúng điều mà các mục trước chỉ
+dự báo: áp dụng cấu hình của công trình gốc cùng lấy mẫu thích nghi cho bài toán
+Burgers. Sai số trung vị giảm $213$ lần, xuống $6{,}48\times10^{-4}$ --- cùng bậc
+với công trình gốc --- và độ phân tán giữa hạt giống co từ $26{,}4$ về $2{,}2$.
+Nhưng kết quả tích cực nhất chương này cũng được đọc với cùng sự dè dặt như các
+kết quả tiêu cực: nó không quy được cho riêng RAR
+(Nhận xét~\ref{nx:khong-quy-cong-rar}), và nó chỉ thu hẹp khoảng cách chi phí
+$1{,}6$ lần --- vẫn bốn bậc độ lớn.
+
+Hai kết quả cuối cùng ấy minh hoạ đúng vai trò của chương: bước kiểm chứng số không
 chỉ xác nhận hay bác bỏ lý thuyết đã có, mà còn chỉ ra chỗ lý thuyết cần được bổ
 sung -- và chỉ ra cả chỗ mà chính chương thực nghiệm đã kết luận vội.
  

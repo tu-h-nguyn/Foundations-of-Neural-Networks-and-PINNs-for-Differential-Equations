@@ -57,6 +57,14 @@ báo cáo thực nghiệm. Kết luận đúng phạm vi là: các thí nghiệm
 \emph{cơ chế} của PINNs, không kiểm chứng \emph{tính cạnh tranh} của chúng
 (Nhận xét~\ref{nx:doc-tn9}).
 
+Mục~\ref{sec:tn10} bổ sung vế còn lại của bức tranh: với cấu hình của công trình
+gốc và lấy mẫu thích nghi, sai số Burgers trung vị giảm $213$ lần, xuống
+$6{,}48\times10^{-4}$ --- xác nhận rằng con số của Mục~\ref{sec:tn5} là giới hạn
+của ngân sách chứ không của phương pháp. Nhưng tỉ số chi phí so với sai phân hữu
+hạn vẫn ở bậc $10^{4}$ ($1{,}1\times10^{4}$ lần, so với $1{,}8\times10^{4}$ ở
+Mục~\ref{sec:tn9}): PINN \emph{có thể} chính xác trên bài toán cứng này, chỉ
+không rẻ hơn.
+
 \paragraph{MT5 --- Khảo sát độ nhạy và phân tích hạn chế.}
 Đã hoàn thành ở mức tương xứng với ngân sách tính toán, nhưng đây cũng là nhiệm
 vụ còn nhiều dư địa nhất; Mục~\ref{sec:hanche} đã nêu thẳng chín hạn chế của chính
@@ -201,8 +209,9 @@ và riêng nó đã loại được bốn con số không tiêu biểu. Việc c
 \emph{cách trình bày} --- gộp trung vị và khoảng vào chính các bảng của
 Mục~\ref{sec:tn1}--\ref{sec:tn7} thay vì để riêng ở Mục~\ref{sec:tn8} --- và
 nâng $n$ từ $5$ lên $10$--$20$ cho những đại lượng lệch mạnh. Hai việc rẻ khác:
-áp dụng lấy mẫu thích nghi RAR cho bài toán Burgers, nơi Mục~\ref{sec:tn8} cho
-thấy sai số trải tới $26$ lần giữa các hạt giống nên dư địa cải thiện là lớn;
+một thí nghiệm tách biến cho Mục~\ref{sec:tn10} --- cùng cấu hình, bỏ RAR --- để
+đo vai trò riêng của lấy mẫu thích nghi, vốn hiện chưa tách được khỏi ba thay đổi
+đi kèm (Nhận xét~\ref{nx:khong-quy-cong-rar});
 và tách riêng tầng thứ nhất của Bảng~\ref{tab:ba-nguyen-nhan} bằng một thiết kế
 khác với Mục~\ref{sec:tn7}. Phép quét $\nu$ ở đó cho thấy tỉ số
 $\norm{e_{\btheta}}/\norm{r_{\btheta}}$ do huấn luyện sinh ra không đo được hằng

@@ -29,7 +29,7 @@ hợp \emph{ba nguyên nhân độc lập, nằm ở ba tầng khác nhau}, cùn
 giảm trên đúng lớp bài toán có thang độ dài nhỏ (Bảng~\ref{tab:ba-nguyen-nhan}).
 
 Phần thực nghiệm cài đặt PINNs bằng PyTorch, không dùng thư viện đóng gói sẵn,
-và kiểm chứng từng phát biểu lý thuyết bằng chín thí nghiệm có tiêu chí thành bại
+và kiểm chứng từng phát biểu lý thuyết bằng mười thí nghiệm có tiêu chí thành bại
 xác định trước. Kết quả được đối chiếu với lý thuyết ở
 Bảng~\ref{tab:doi-chieu}. Những kết quả không đạt kỳ vọng cũng được trình bày
 đầy đủ: \emph{ba} kết quả buộc phải siết lại chính các chương lý thuyết --- một
@@ -45,7 +45,11 @@ dẫn trước đó, trong khi các kết luận định tính đều đứng v�
 thẳng: trên bài toán một chiều được khảo sát, PINN chậm hơn bộ giải sai phân hữu
 hạn khoảng bốn bậc độ lớn ở cùng mức sai số, nên giá trị của phương pháp phải được biện minh
 bằng bài toán ngược, dữ liệu biên khuyết và số chiều cao chứ không bằng chi phí
-(Mục~\ref{sec:tn9}).
+(Mục~\ref{sec:tn9}). Cuối cùng, áp dụng chính các biện pháp khắc phục mà báo cáo
+đề xuất --- cấu hình của công trình gốc cùng lấy mẫu thích nghi --- đưa sai số
+Burgers trung vị từ $1{,}38\times10^{-1}$ xuống $6{,}48\times10^{-4}$, tức tốt hơn
+$213$ lần và cùng bậc với công trình gốc, nhưng khoảng cách về chi phí vẫn ở bậc
+$10^{4}$ (Mục~\ref{sec:tn10}).
 
 \bigskip
 \noindent\textbf{Từ khoá:} mạng nơ-ron thông tin vật lý, phương trình vi phân,
@@ -80,7 +84,7 @@ optimisation level and spectral bias at the approximation level, this yields
 degrade PINNs on precisely the class of problems with small length scales.
 
 The experimental part implements PINNs in PyTorch without any packaged PINN
-library and tests each theoretical claim through nine experiments with success
+library and tests each theoretical claim through ten experiments with success
 criteria fixed in advance. Negative results are reported in full: three of them
 forced a restatement in the theoretical chapters themselves -- a claim about
 spectral bias, a reading of the stability constant as an operative mechanism,
@@ -93,7 +97,11 @@ direct cost measurement gives a further result worth stating plainly: on the
 one-dimensional problems studied here the PINN is about four orders of magnitude
 slower than a finite-difference solver at the same accuracy, so the value of the
 method must be argued from inverse problems, incomplete boundary data and high
-dimension rather than from cost.
+dimension rather than from cost. Finally, applying the remedies the report itself proposes -- the
+original authors' configuration together with residual-based adaptive
+refinement -- lowers the median Burgers error from $1.38\times10^{-1}$ to
+$6.48\times10^{-4}$, a $213$-fold improvement on par with the original work,
+while the cost gap stays at four orders of magnitude.
 
 \bigskip
 \noindent\textbf{Keywords:} physics-informed neural networks, differential

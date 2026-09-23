@@ -151,6 +151,9 @@ def run(seed, ref=None):
            "duong_sai_so": duong}
     os.makedirs(OUT, exist_ok=True)
     json.dump(ket, open(os.path.join(OUT, f"exp10_seed{seed}.json"), "w"), indent=1)
+    # Trong so cuoi (float64, ~3 000 tham so): de ve sai so dung do chinh xac
+    # kep -- anh chup float16 chi dung cho hinh u, khong dung cho sai so.
+    torch.save(net.state_dict(), os.path.join(OUT, f"exp10_trongso_seed{seed}.pt"))
     np.savez_compressed(os.path.join(OUT, f"exp10_anh_seed{seed}.npz"),
                         anh=np.stack(anh), xs=xs, tt=tt,
                         buoc=np.array([d["buoc"] for d in duong]),

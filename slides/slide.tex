@@ -383,6 +383,61 @@ lời nguyền số chiều.
 \end{frame}
 
 %==============================================================
+\begin{frame}{TN10: áp dụng chính các biện pháp báo cáo đề xuất}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \textbf{TN5} & \textbf{TN10} \\
+\midrule
+Mạng & $4\times32$ & $8\times20$ \\
+$N_r$ & $2\,500$ & $10\,000$ + RAR \\
+L-BFGS & $800$ vòng & $6$ đợt $\times$ $2\,000$ \\
+\midrule
+$\varepsilon_{L^2}$ trung vị & $1{,}38\times10^{-1}$ & \good{$6{,}48\times10^{-4}$} \\
+khoảng, max/min & $26{,}4$ & $2{,}2$ \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\footnotesize Công trình gốc (Raissi 2019): $6{,}7\times10^{-4}$.
+\end{column}
+\begin{column}{0.43\textwidth}
+\begin{block}{Tốt hơn \alert{213 lần}}
+Hạt giống \emph{tệ nhất} của TN10 vẫn tốt hơn hạt giống \emph{tốt nhất} của
+TN5 gần $10$ lần.
+\end{block}
+\begin{alertblock}{Nhưng nói cho đúng}
+\footnotesize
+\begin{itemize}
+\item $83\%$ mức cải thiện (thang log) có \emph{trước} điểm RAR đầu tiên
+  $\Rightarrow$ không quy công cho RAR.
+\item Vẫn chậm hơn sai phân hữu hạn $\sim 10^{4}$ lần.
+\end{itemize}
+\end{alertblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+%==============================================================
+\begin{frame}{Xem nó xảy ra: PINN học phương trình Burgers}
+\centering
+\hoathinh[0.68\textheight]{tn10_burgers_huan_luyen}
+
+\footnotesize Hạt giống \emph{trung vị} trong năm, không phải hạt giống đẹp nhất.
+\end{frame}
+
+%==============================================================
+\begin{frame}{Xem nó xảy ra: sóng sin dựng thành sốc tại $x = 0$}
+\centering
+\hoathinh[0.68\textheight]{tn10_burgers_theo_thoi_gian}
+
+\footnotesize Sai số (panel dưới, thang log) dồn vào lớp sốc --- đúng dự báo
+của bảng ba tầng.
+\end{frame}
+
+%==============================================================
 \begin{frame}{Đối chiếu lý thuyết và thực nghiệm: 14 hạng mục}
 \begin{columns}[T]
 \begin{column}{0.46\textwidth}

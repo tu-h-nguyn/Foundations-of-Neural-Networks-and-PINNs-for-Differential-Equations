@@ -87,7 +87,15 @@ class GhiKhung:
         self.pdf.savefig(self.fig)           # khung cuoi luon co trong PDF
         self.pdf.close()
         ks = self.khung + [self.khung[-1]] * giu_cuoi
-        ks = [k.quantize(colors=200, method=Image.Quantize.MEDIANCUT) for k in ks]
+        # Mot bang mau chung cho moi khung (lay tu khung dau, giua, cuoi): pixel
+        # khong doi giua hai khung giu nguyen chi so mau, nen GIF nen tot hon
+        # han va khong nhap nhay dai mau nhu khi moi khung tu luong tu hoa.
+        mau = [ks[0], ks[len(ks) // 2], ks[-1]]
+        ghep = Image.new("RGB", (mau[0].width, mau[0].height * 3))
+        for i, k in enumerate(mau):
+            ghep.paste(k, (0, i * k.height))
+        bang = ghep.quantize(colors=224, method=Image.Quantize.MEDIANCUT)
+        ks = [k.quantize(palette=bang, dither=Image.Dither.NONE) for k in ks]
         duong = os.path.join(GIF_DIR, self.ten + ".gif")
         ks[0].save(duong, save_all=True, append_images=ks[1:], duration=ms,
                    loop=0, optimize=True, disposal=2)
@@ -267,6 +275,24 @@ def _chon_hat_giong_trung_vi():
     return r, rs
 
 
+def _du_doan_cuoi(seed, x, ts):
+    """u_theta cuoi cua mot hat giong tren luoi (ts, x), float64 day du.
+
+    Anh chup float16 chi du cho ban do mau u; buoc luong tu cua float16 gan
+    |u| ~ 1 la 4,9e-4 -- cung bac voi chinh sai so can ve -- nen moi hinh SAI
+    SO phai tinh lai tu trong so da luu."""
+    from .exp10_burgers_manh import LAYERS
+    f = os.path.join(RES, f"exp10_trongso_seed{seed}.pt")
+    if not os.path.exists(f):
+        raise SystemExit(f"thieu {f} -- chay lai pinns.exp10_burgers_manh {seed}")
+    net = FNN(LAYERS, act="tanh")
+    net.load_state_dict(torch.load(f))
+    X = torch.tensor(np.stack(np.meshgrid(x, ts, indexing="ij"), -1).reshape(-1, 2),
+                     dtype=DTYPE)
+    with torch.no_grad():
+        return net(X).reshape(len(x), len(ts)).numpy().T
+
+
 def anim_burgers():
     from . import exp5_burgers as B
     r, rs = _chon_hat_giong_trung_vi()
@@ -280,7 +306,7 @@ def anim_burgers():
 
     fig = plt.figure(figsize=(10.8, 5.2))
     gs = fig.add_gridspec(3, 3, width_ratios=[1.6, 1, 1], height_ratios=[1, 1, 1],
-                          left=0.06, right=0.985, top=0.84, bottom=0.09,
+                          left=0.075, right=0.985, top=0.84, bottom=0.09,
                           hspace=0.75, wspace=0.34)
     fig.suptitle("TN10 · PINN học phương trình Burgers, "
                  r"$u_t + u\,u_x = (0{,}01/\pi)\,u_{xx}$",
@@ -323,8 +349,11 @@ def anim_burgers():
             fontsize=8, color=CHU2)
     tn5 = json.load(open(os.path.join(RES, "exp10_tomtat.json")))["tn5_trung_vi"]
     ae.axhline(tn5, color=CAM, lw=1.2, ls=(0, (4, 2)))
-    ae.text(buoc[-1], tn5 * 1.25, f"TN5 gốc: {tn5:.2f}", ha="right",
+    ae.text(buoc[-1], tn5 * 1.25, f"TN5 gốc (trung vị): {tn5:.2f}", ha="right",
             fontsize=8, color=CHU)
+    ae.axhline(6.7e-4, color=THAM, lw=1.0, ls=(0, (1, 2)))
+    ae.text(buoc[-1], 6.7e-4 * 0.62, "Raissi 2019: 6,7e-4", ha="right",
+            va="top", fontsize=8, color=CHU2)
     ce, = ae.plot([], [], color=PINN)
     ch, = ae.plot([], [], "o", color=PINN, ms=6, mec=MAT, mew=1.5)
     ae.set_xlabel("số lần đánh giá hàm mục tiêu")
@@ -333,9 +362,9 @@ def anim_burgers():
                     fontweight="bold")
 
     chon = list(range(len(anh)))
-    if len(chon) > 150:                       # giu GIF nhe: toi da ~150 khung
-        buoc_nhay = len(chon) / 150
-        chon = sorted({int(i * buoc_nhay) for i in range(150)} | {len(anh) - 1})
+    if len(chon) > 120:                       # giu GIF nhe: toi da ~120 khung
+        buoc_nhay = len(chon) / 120
+        chon = sorted({int(i * buoc_nhay) for i in range(120)} | {len(anh) - 1})
     g = GhiKhung("tn10_burgers_huan_luyen", fig, pdf_moi=3)
     for i in chon:
         im.set_data(anh[i])
@@ -351,10 +380,10 @@ def anim_vatly():
     from . import exp5_burgers as B
     r, _ = _chon_hat_giong_trung_vi()
     s = r["seed"]
-    d = np.load(os.path.join(RES, f"exp10_anh_seed{s}.npz"))
-    cuoi, xs, tt = d["anh"][-1].astype(np.float32), d["xs"], d["tt"]
     x, ts, U, _ = B.reference(Nx=2047)
-    print(f"[anim] vatly: hat giong trung vi s{s}")
+    P = _du_doan_cuoi(s, x, ts)                  # (len(ts), len(x)), float64
+    print(f"[anim] vatly: hat giong trung vi s{s}, "
+          f"eps_L2 tinh lai = {np.linalg.norm(P - U) / np.linalg.norm(U):.4e}")
 
     fig, (a1, a2) = plt.subplots(2, 1, figsize=(8.6, 5.0), sharex=True,
                                  gridspec_kw={"height_ratios": [2.4, 1]})
@@ -370,16 +399,14 @@ def anim_vatly():
     nb = a1.text(0.02, 0.92, "", transform=a1.transAxes, fontsize=10.5,
                  color=CHU, fontweight="bold", va="top")
     le, = a2.plot([], [], color=PINN, lw=1.4)
-    a2.set_yscale("log"); a2.set_ylim(1e-5, 2); a2.set_xlim(-1, 1)
+    a2.set_yscale("log"); a2.set_ylim(1e-7, 1); a2.set_xlim(-1, 1)
     a2.set_ylabel("|sai số|"); a2.set_xlabel("x")
 
     g = GhiKhung("tn10_burgers_theo_thoi_gian", fig, pdf_moi=2)
-    for kk, tv in enumerate(tt):
-        k = int(np.argmin(abs(ts - tv)))
-        lr.set_data(x, U[k]); lp.set_data(xs, cuoi[:, kk])
-        ui = np.interp(xs, x, U[k])
-        le.set_data(xs, np.maximum(abs(cuoi[:, kk] - ui), 1.1e-5))
-        nb.set_text(f"t = {tv:.2f}")
+    for k in range(0, len(ts), 2):
+        lr.set_data(x, U[k]); lp.set_data(x, P[k])
+        le.set_data(x, np.maximum(abs(P[k] - U[k]), 1.1e-7))
+        nb.set_text(f"t = {ts[k]:.2f}")
         g.ghi()
     g.dong(ms=70, giu_cuoi=28)
 
@@ -393,7 +420,7 @@ def hinh_tn10():
     r, rs = _chon_hat_giong_trung_vi()
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.2, 3.5),
                                  gridspec_kw={"width_ratios": [1.25, 1]})
-    fig.subplots_adjust(left=0.075, right=0.985, top=0.9, bottom=0.15, wspace=0.26)
+    fig.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.15, wspace=0.26)
     tn5 = json.load(open(os.path.join(RES, "exp10_tomtat.json")))["tn5_trung_vi"]
     for q in sorted(rs, key=lambda q: q["seed"]):
         b = [d["buoc"] for d in q["duong_sai_so"]]
@@ -413,15 +440,20 @@ def hinh_tn10():
     a1.set_title("(a) Hội tụ trên năm hạt giống", loc="left")
     a1.legend(loc="upper right", fontsize=8)
 
-    d = np.load(os.path.join(RES, f"exp10_anh_seed{r['seed']}.npz"))
-    cuoi, xs, tt = d["anh"][-1].astype(np.float32), d["xs"], d["tt"]
-    im = a2.imshow(cuoi, origin="lower", aspect="auto", cmap=PHAN_KY, vmin=-1,
-                   vmax=1, extent=[tt[0], tt[-1], xs[0], xs[-1]],
-                   interpolation="bilinear")
+    x, ts, U, _ = B.reference(Nx=2047)
+    P = _du_doan_cuoi(r["seed"], x, ts)
+    E = np.log10(np.maximum(abs(P - U), 1e-7))
+    DON_SAC = LinearSegmentedColormap.from_list(
+        "xanh_don", [MAT, "#cfe0f5", "#86b6ef", "#2a78d6", "#0d366b"])
+    im = a2.imshow(E.T, origin="lower", aspect="auto", cmap=DON_SAC, vmin=-5,
+                   vmax=-2, extent=[ts[0], ts[-1], x[0], x[-1]],
+                   interpolation="nearest")
     a2.grid(False); a2.set_xlabel("t"); a2.set_ylabel("x")
-    a2.set_title(r"(b) $u_\theta(x,t)$ sau huấn luyện", loc="left")
-    cb = fig.colorbar(im, ax=a2, fraction=0.05, pad=0.02, ticks=[-1, 0, 1])
-    cb.outline.set_visible(False)
+    a2.set_title(rf"(b) $|u_\theta - u|$, hạt giống s = {r['seed']}", loc="left")
+    cb = fig.colorbar(im, ax=a2, fraction=0.05, pad=0.03,
+                      ticks=[-5, -4, -3, -2])
+    cb.ax.set_yticklabels([rf"$10^{{{k}}}$" for k in range(-5, -1)])
+    cb.outline.set_visible(False); cb.ax.tick_params(labelsize=8)
     ra = os.path.join(GOC, "Images", "chap_5", "fig57_tn10.pdf")
     fig.savefig(ra); plt.close(fig)
     print("  ->", ra)

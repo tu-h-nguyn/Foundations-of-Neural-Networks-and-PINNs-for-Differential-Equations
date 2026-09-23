@@ -24,6 +24,22 @@ python -m pinns.exp9_chiphi      # TN9: chi phí tính toán, PINN so với sai 
 python -m pinns.run_all          # chạy tất cả
 ```
 
+**TN10** (Burgers, cấu hình của công trình gốc + RAR) mất khoảng 40 phút một hạt
+giống trên một lõi, nên chạy từng hạt giống song song rồi tổng kết:
+
+```bash
+export OMP_NUM_THREADS=1
+for s in 0 1 2 3 4; do python -m pinns.exp10_burgers_manh $s & done; wait
+python -m pinns.exp10_burgers_manh tong_ket   # gộp 5 hạt giống + đo chi phí sai phân
+python -m pinns.animate tat_ca                # GIF (Images/anim), PDF khung (slides/anim), hình 5.7
+```
+
+Mỗi hạt giống ghi `results/exp10_seed<s>.json` (số liệu), `exp10_trongso_seed<s>.pt`
+(trọng số cuối, `float64`) và `exp10_anh_seed<s>.npz` (ảnh chụp `float16` cho
+hoạt hình — không đưa vào git). Ảnh chụp `float16` chỉ dùng để vẽ `u`; mọi hình
+**sai số** tính lại từ trọng số, vì bước lượng tử của `float16` gần `|u| ≈ 1` là
+`4,9e-4`, cùng bậc với chính sai số cần vẽ.
+
 `exp8_seeds` ghi kết quả ra `results/` **sau mỗi hạt giống** và đọc lại phần đã
 có khi chạy lại, nên một lần chạy bị ngắt không làm mất gì. Nó nhận thêm tham số
 `heat`, `burgers`, `pho` (TN3) hoặc `lambda` (TN2) để chạy riêng một phần.
