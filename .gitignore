@@ -62,3 +62,6 @@ slides/slide.pdf
 # Anh chup TN10 cho animation (lon, sinh lai duoc)
 # =========================
 code/results/exp10_anh_seed*.npz
+
+# PDF bao cao bien dich ra (sinh lai bang latexmk)
+/main.pdf
