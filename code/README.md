@@ -34,6 +34,15 @@ python -m pinns.exp10_burgers_manh tong_ket   # gộp 5 hạt giống + đo chi 
 python -m pinns.animate tat_ca                # GIF (Images/anim), PDF khung (slides/anim), hình 5.7
 ```
 
+**TN10b** tách biến vai trò của RAR: cùng cấu hình TN10, rẽ ba nhánh (RAR / thêm
+điểm ngẫu nhiên cùng số lượng / không thêm) từ cùng trạng thái sau đợt L-BFGS
+thứ nhất. Nhánh RAR phải khớp TN10 từng bit — script tự kiểm và ghi `khop_TN10`.
+
+```bash
+for s in 0 1 2 3 4; do python -m pinns.exp10b_rar_tachbien $s & done; wait
+python -m pinns.exp10b_rar_tachbien tong_ket
+```
+
 Mỗi hạt giống ghi `results/exp10_seed<s>.json` (số liệu), `exp10_trongso_seed<s>.pt`
 (trọng số cuối, `float64`) và `exp10_anh_seed<s>.npz` (ảnh chụp `float16` cho
 hoạt hình — không đưa vào git). Ảnh chụp `float16` chỉ dùng để vẽ `u`; mọi hình

@@ -13,6 +13,7 @@ MODULES = [
     ("TN8  do phan tan giua hat giong",  "pinns.exp8_seeds"),
     ("TN9  chi phi tinh toan thuc do",   "pinns.exp9_chiphi"),
     ("TN10 Burgers, cau hinh manh",      "pinns.exp10_burgers_manh"),
+    ("TN10b tach bien RAR",              "pinns.exp10b_rar_tachbien"),
 ]
 
 
