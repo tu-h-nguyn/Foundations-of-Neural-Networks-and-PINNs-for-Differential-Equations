@@ -539,11 +539,149 @@ def hinh_tn10c():
     print("  ->", ra)
 
 
+# ================================================================ TN11
+def _tn11_doc():
+    A, CB = [], []
+    for s in range(5):
+        for ten in ("sach", "nhieu1"):
+            f = os.path.join(RES, f"exp11_pinn_{ten}_seed{s}.json")
+            if os.path.exists(f):
+                A.append(json.load(open(f)))
+        f = os.path.join(RES, f"exp11_codien_seed{s}.json")
+        if os.path.exists(f):
+            CB += json.load(open(f))
+    return A, CB
+
+
+def anim_nguoc():
+    """TN11: PINN nhan dang z1, z2 tu 2000 diem do nhieu 1%, khong biet dau/bien.
+    Hat giong TRUNG VI theo sai so z2 trong nam lan chay co nhieu."""
+    from . import exp5_burgers as B
+    from .exp11_nguoc import du_lieu, Z1, Z2
+    A, CB = _tn11_doc()
+    nh = sorted([q for q in A if q["sigma"] == 0.01], key=lambda q: q["sai_z2"])
+    r = nh[len(nh) // 2]
+    s = r["seed"]
+    d = np.load(os.path.join(RES, f"exp11_anh_nhieu1_seed{s}.npz"))
+    anh, xs, tt, buoc_anh = d["anh"].astype(np.float32), d["xs"], d["tt"], d["buoc"]
+    ref = B.reference(Nx=2047)
+    xd, td, yd = du_lieu(s, 0.01, ref)
+    duong = r["duong"]
+    b = np.array([q["buoc"] for q in duong])
+    z1 = np.array([q["z1"] for q in duong]); e2 = np.array([q["sai_z2"] for q in duong])
+    c1023 = st.median(q["sai_z2"] for q in CB if q["doi_thu"] == "C" and q["Nx"] == 1023
+                      and q["sigma"] == 0.01)
+    print(f"[anim] nguoc: hat giong trung vi s{s}, {len(anh)} anh chup")
+
+    fig = plt.figure(figsize=(10.8, 5.2))
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.45, 1], left=0.065, right=0.985,
+                          top=0.8, bottom=0.1, hspace=0.55, wspace=0.28)
+    fig.suptitle("TN11 · PINN tìm độ nhớt từ 2 000 điểm đo nhiễu, không biết điều kiện đầu và biên",
+                 x=0.065, ha="left", fontsize=12, fontweight="bold", color=CHU)
+    fig.text(0.065, 0.885, f"hạt giống trung vị trong 5 (s = {s}) · nhiễu 1% · ẩn số: "
+             r"trọng số mạng, $\zeta_1$, $\zeta_2$ trong $u_t + \zeta_1 u u_x - \zeta_2 u_{xx} = 0$",
+             fontsize=9, color=CHU2)
+    ah = fig.add_subplot(gs[:, 0])
+    im = ah.imshow(anh[0], origin="lower", aspect="auto", cmap=PHAN_KY, vmin=-1, vmax=1,
+                   extent=[tt[0], tt[-1], xs[0], xs[-1]], interpolation="bilinear")
+    ah.scatter(td, xd, s=2.2, c=CHU, alpha=0.35, linewidths=0)
+    ah.grid(False); ah.set_xlabel("t"); ah.set_ylabel("x")
+    ah.set_title(r"$u_\theta(x,t)$ và 2 000 điểm đo (chấm đen)", loc="left")
+    cb = fig.colorbar(im, ax=ah, fraction=0.05, pad=0.02, ticks=[-1, 0, 1])
+    cb.outline.set_visible(False); cb.ax.tick_params(labelsize=8)
+
+    a1 = fig.add_subplot(gs[0, 1])
+    a1.axhline(Z1, color=THAM, lw=1.2, ls=(0, (4, 2)))
+    a1.text(b[-1], Z1 + 0.06, "đúng: 1", ha="right", fontsize=8, color=CHU2)
+    a1.set_xlim(0, b[-1] * 1.02); a1.set_ylim(-0.1, 1.25)
+    a1.set_title(r"$\zeta_1$ (khởi tạo 0)", loc="left")
+    l1, = a1.plot([], [], color=PINN)
+    p1, = a1.plot([], [], "o", color=PINN, ms=6, mec=MAT, mew=1.5)
+
+    a2 = fig.add_subplot(gs[1, 1])
+    a2.set_yscale("log"); a2.set_xlim(0, b[-1] * 1.02)
+    a2.set_ylim(min(e2.min(), c1023) * 0.4, 1.5)
+    a2.axhline(c1023, color=CAM, lw=1.2, ls=(0, (4, 2)))
+    a2.text(b[-1], c1023 * 1.35, f"liên hợp rời rạc, Nx = 1023: {c1023:.2%}",
+            ha="right", fontsize=8, color=CHU)
+    a2.set_title(r"sai số tương đối của $\zeta_2$", loc="left")
+    a2.set_xlabel("số lần đánh giá hàm mục tiêu")
+    l2, = a2.plot([], [], color=PINN)
+    p2, = a2.plot([], [], "o", color=PINN, ms=6, mec=MAT, mew=1.5)
+    nhan = fig.text(0.985, 0.885, "", ha="right", fontsize=9.5, color=CHU, fontweight="bold")
+
+    chon = list(range(len(anh)))
+    if len(chon) > 110:
+        bn = len(chon) / 110
+        chon = sorted({int(i * bn) for i in range(110)} | {len(anh) - 1})
+    g = GhiKhung("tn11_nhan_dang", fig, pdf_moi=2)
+    for k in chon:
+        bk = buoc_anh[k]
+        m = b <= bk
+        im.set_data(anh[k])
+        l1.set_data(b[m], z1[m]); p1.set_data([b[m][-1]], [z1[m][-1]])
+        l2.set_data(b[m], e2[m]); p2.set_data([b[m][-1]], [e2[m][-1]])
+        nhan.set_text(f"bước {bk:,} · ζ₂ sai {e2[m][-1]:.2%}".replace(",", " "))
+        g.ghi()
+    g.dong(ms=90, giu_cuoi=26)
+
+
+def hinh_tn11():
+    """Hinh 5.10: sai so z2 va thoi gian cua ba doi thu, tung hat giong."""
+    A, CB = _tn11_doc()
+    nhom = [("PINN", None, None, PINN),
+            ("liên hợp\nNx = 1023", None, ("C", 1023), CAM),
+            ("liên hợp\nNx = 511", None, ("C", 511), CAM),
+            ("biết đầu/biên\nNx = 1023", None, ("B", 1023), THAM),
+            ("biết đầu/biên\nNx = 511", None, ("B", 511), THAM)]
+
+    def lay(i, sg, k):
+        ten, _, nguon, _ = nhom[i]
+        if ten == "PINN":
+            ds = [q for q in A if q["sigma"] == sg]
+        else:
+            ds = [q for q in CB if q["doi_thu"] == nguon[0] and q["Nx"] == nguon[1]
+                  and q["sigma"] == sg]
+        return [q[k] for q in sorted(ds, key=lambda q: q["seed"])]
+
+    fig, axs = plt.subplots(1, 3, figsize=(10.2, 3.9))
+    fig.subplots_adjust(left=0.07, right=0.985, top=0.8, bottom=0.25, wspace=0.34)
+    muc = [(0.0, "sai_z2", r"(a) sai số $\zeta_2$, dữ liệu sạch"),
+           (0.01, "sai_z2", r"(b) sai số $\zeta_2$, nhiễu 1%"),
+           (None, "giay", "(c) thời gian mỗi lần chạy (giây)")]
+    for ax, (sg, k, tieu) in zip(axs, muc):
+        for i, (ten, _, _, mau) in enumerate(nhom):
+            if sg is None:
+                v = lay(i, 0.0, k) + lay(i, 0.01, k)
+            else:
+                v = lay(i, sg, k)
+            if not v:
+                continue
+            xj = i + np.linspace(-0.12, 0.12, len(v))
+            ax.plot(xj, v, linestyle="none", color=mau, ms=6, mec=MAT, mew=1.2,
+                    marker="o" if "511" not in ten else "s")
+            ax.plot([i - 0.25, i + 0.25], [st.median(v)] * 2, color=CHU, lw=2)
+        ax.set_yscale("log")
+        ax.set_xticks(range(len(nhom)))
+        ax.set_xticklabels([n[0] for n in nhom], fontsize=7.5, rotation=0)
+        ax.set_xlim(-0.5, len(nhom) - 0.5); ax.grid(axis="x", visible=False)
+        ax.set_title(tieu, loc="left")
+    for ax in axs[:2]:
+        ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(
+            lambda v, _: f"{v:.1%}".replace(".", ",") if v >= 0.001 else f"{v:.2%}".replace(".", ",")))
+    fig.text(0.07, 0.93, "Cùng 2 000 điểm đo cho mọi đối thủ; mỗi chấm là một hạt giống, "
+             "vạch đen là trung vị. PINN và \"liên hợp\" không biết điều kiện đầu và biên.",
+             fontsize=8.5, color=CHU2)
+    ra = os.path.join(GOC, "Images", "chap_5", "fig510_tn11.pdf")
+    fig.savefig(ra); plt.close(fig)
+    print("  ->", ra)
+
+
 if __name__ == "__main__":
     torch.set_num_threads(max(1, torch.get_num_threads()))
     cai = sys.argv[1] if len(sys.argv) > 1 else "tat_ca"
     bang = {"relu": anim_relu, "pho": anim_pho, "burgers": anim_burgers,
             "vatly": anim_vatly, "hinh": hinh_tn10, "tachbien": hinh_tn10b,
-            "rad": hinh_tn10c}
+            "rad": hinh_tn10c, "nguoc": anim_nguoc, "hinh11": hinh_tn11}
     for k in (bang if cai == "tat_ca" else [cai]):
         bang[k]()
