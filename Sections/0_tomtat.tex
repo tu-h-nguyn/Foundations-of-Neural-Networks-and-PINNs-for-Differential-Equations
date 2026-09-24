@@ -29,14 +29,15 @@ hợp \emph{ba nguyên nhân độc lập, nằm ở ba tầng khác nhau}, cùn
 giảm trên đúng lớp bài toán có thang độ dài nhỏ (Bảng~\ref{tab:ba-nguyen-nhan}).
 
 Phần thực nghiệm cài đặt PINNs bằng PyTorch, không dùng thư viện đóng gói sẵn,
-và kiểm chứng từng phát biểu lý thuyết bằng mười thí nghiệm có tiêu chí thành bại
+và kiểm chứng từng phát biểu lý thuyết bằng mười một thí nghiệm có tiêu chí thành bại
 xác định trước. Kết quả được đối chiếu với lý thuyết ở
 Bảng~\ref{tab:doi-chieu}. Những kết quả không đạt kỳ vọng cũng được trình bày
-đầy đủ: \emph{ba} kết quả buộc phải siết lại chính các chương lý thuyết --- một
+đầy đủ: \emph{năm} kết quả buộc phải siết lại chính các chương lý thuyết --- một
 phát biểu về thiên kiến phổ (Nhận xét~\ref{nx:hieu-chinh}), một cách đọc hằng số
-ổn định như thể nó là cơ chế đang vận hành (Nhận xét~\ref{nx:doc-tn7}), và một
+ổn định như thể nó là cơ chế đang vận hành (Nhận xét~\ref{nx:doc-tn7}), một
 ước lượng chi phí đồ thị thấp hơn giá trị đo được
-(Nhận xét~\ref{nx:chi-phi-bac-cao}) --- còn một kết quả tiêu cực về thuật toán
+(Nhận xét~\ref{nx:chi-phi-bac-cao}), và hai phát biểu về bài toán ngược
+(Nhận xét~\ref{nx:doc-tn11}) --- còn một kết quả tiêu cực về thuật toán
 cân bằng trọng số thì dẫn tới một chứng minh mới về chế độ phản hồi dương của
 quy tắc ấy (Bổ đề~\ref{bd:phan-hoi-duong}). Việc lặp lại mọi thí nghiệm có phụ thuộc ngẫu
 nhiên trên năm hạt giống còn loại bỏ được bốn con số mà chính báo cáo đã trích
@@ -52,7 +53,12 @@ $213$ lần và cùng bậc với công trình gốc, nhưng khoảng cách về
 $10^{4}$ (Mục~\ref{sec:tn10}). Một thí nghiệm tách biến cho thấy mức cải thiện ấy
 đến gần như hoàn toàn từ cấu hình mạng và tối ưu hoá: ba chiến lược lấy mẫu
 thích nghi được thử đều chỉ phân phối lại sai số giữa lớp sốc và vùng trơn, chứ
-không làm giảm tổng sai số.
+không làm giảm tổng sai số. Thí nghiệm duy nhất đặt PINN vào đúng động lực của nó
+--- tìm độ nhớt từ $2\,000$ điểm đo có nhiễu, không biết điều kiện đầu và biên ---
+cho sai số trung vị dưới $0{,}5\%$, tái lập kết quả của công trình gốc; nhưng một
+phương pháp liên hợp rời rạc được cho cùng thông tin đạt độ chính xác cùng bậc và
+có đáp số sớm hơn, nên ưu thế của PINN ở đây nằm ở công sức xây dựng phương pháp
+chứ không ở chi phí tính toán (Mục~\ref{sec:tn11}).
 
 \bigskip
 \noindent\textbf{Từ khoá:} mạng nơ-ron thông tin vật lý, phương trình vi phân,
@@ -87,11 +93,12 @@ optimisation level and spectral bias at the approximation level, this yields
 degrade PINNs on precisely the class of problems with small length scales.
 
 The experimental part implements PINNs in PyTorch without any packaged PINN
-library and tests each theoretical claim through ten experiments with success
-criteria fixed in advance. Negative results are reported in full: three of them
+library and tests each theoretical claim through eleven experiments with success
+criteria fixed in advance. Negative results are reported in full: five of them
 forced a restatement in the theoretical chapters themselves -- a claim about
 spectral bias, a reading of the stability constant as an operative mechanism,
-and a cost estimate that measurement showed to be too low -- and a negative
+a cost estimate that measurement showed to be too low, and two claims about
+inverse problems -- and a negative
 result on adaptive loss balancing led to a new proof that the balancing rule has
 a positive-feedback failure mode. Repeating every seed-dependent experiment over
 five random seeds further eliminated four figures the report had itself quoted,
@@ -107,7 +114,13 @@ $6.48\times10^{-4}$, a $213$-fold improvement on par with the original work,
 while the cost gap stays at four orders of magnitude. An ablation shows the gain
 comes almost entirely from the network and optimiser configuration: the three
 adaptive sampling strategies tested only redistribute the error between the
-shock and the smooth region, without reducing it overall.
+shock and the smooth region, without reducing it overall. The one experiment that
+places the PINN in its intended setting -- identifying the viscosity from $2\,000$
+noisy measurements without initial or boundary data -- gives a median error below
+$0.5\%$, reproducing the original work; but a discrete adjoint method given the
+same information reaches comparable accuracy and settles on its answer sooner, so
+the PINN's advantage there lies in the effort of building the method rather than
+in computational cost.
 
 \bigskip
 \noindent\textbf{Keywords:} physics-informed neural networks, differential

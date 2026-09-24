@@ -11,16 +11,18 @@ chứng đó.
 Mục tiêu không dừng ở chỗ trình bày một cài đặt chạy được. Mỗi thí nghiệm dưới
 đây được thiết kế để trả lời một câu hỏi cụ thể do Chương~\ref{chap:pinn} đặt ra,
 với tiêu chí thành công hoặc thất bại xác định \emph{trước} khi chạy. Ta báo cáo
-đầy đủ cả những chỗ khớp lẫn những chỗ không khớp: trong mười bốn hạng mục đối
+đầy đủ cả những chỗ khớp lẫn những chỗ không khớp: trong mười sáu hạng mục đối
 chiếu ở Mục~\ref{sec:doi-chieu}, sáu khớp trọn vẹn, hai khớp về hướng nhưng
-không về độ lớn, \emph{bốn} buộc phải siết lại cách phát biểu, một không tái lập
+không về độ lớn, \emph{sáu} buộc phải siết lại cách phát biểu, một không tái lập
 được khi đổi hạt giống, và một cho kết quả trái với kỳ vọng.
 Phần điều chỉnh được ghi rõ thay vì bỏ qua; theo quan điểm của báo cáo, một kết
 quả tiêu cực được phân tích đúng nguyên nhân có giá trị ngang một kết quả khớp.
  
 Cấu trúc chương: Mục~\ref{sec:trienkhai} mô tả kiến trúc cài đặt trên
 PyTorch~\cite{paszke2019} và cấu hình chung. Các
-Mục~\ref{sec:tn1}--\ref{sec:tn10} trình bày mười thí nghiệm.
+Mục~\ref{sec:tn1}--\ref{sec:tn11} trình bày mười một thí nghiệm: mười bài toán
+thuận, và một bài toán ngược đặt cạnh một phương pháp cổ điển được cho cùng thông
+tin.
 Mục~\ref{sec:doi-chieu} đối chiếu toàn bộ lý thuyết với số liệu, và
 Mục~\ref{sec:hanche} nêu thẳng những hạn chế của thiết kế thực nghiệm này.
  
@@ -1709,7 +1711,9 @@ phép đo; (ii) PINN cho một hàm khả vi mọi nơi, trong khi sai phân cho
 trên lưới --- tuy ở mức sai số $14\%$ thì lợi thế này mỏng, vì nội suy lưới sai
 phân rẻ hơn nhiều; (iii) bài toán ngược chỉ cần thêm một số hạng vào hàm mục
 tiêu, trong khi phương pháp cổ điển đòi hỏi cả một bộ máy liên hợp
-(Mục~\ref{subsec:thuan-nguoc}).
+(Mục~\ref{subsec:thuan-nguoc}). Lợi thế thứ ba về sau đã được đo, ở
+Mục~\ref{sec:tn11}: nó có thật, nhưng là lợi thế về công sức xây dựng phương pháp
+chứ không về chi phí tính toán (Nhận xét~\ref{nx:doc-tn11}).
 
 Kết luận trung thực là: \emph{trên lớp bài toán mà báo cáo này thực nghiệm,
 PINNs đắt hơn bốn bậc so với phương pháp cổ điển ở cùng độ chính xác; giá trị
@@ -2152,6 +2156,213 @@ phép quét theo $N_r$.
 \end{nhanxet}
 
 %==============================================================================
+\section{Thí nghiệm 11: bài toán ngược --- đặt PINN vào đúng động lực của nó}
+\label{sec:tn11}
+%==============================================================================
+
+\begin{thinghiem}[Nhận dạng độ nhớt khi không biết điều kiện đầu và điều kiện
+biên]
+\label{tn:nguoc}
+Mười thí nghiệm trước đều là bài toán thuận, đủ dữ liệu, nên cùng nằm ngoài ba
+động lực mà Mục~\ref{subsec:gioi-han-co-dien} dùng để biện minh cho PINNs
+(Nhận xét~\ref{nx:doc-tn9}). Thí nghiệm này đặt PINN vào đúng động lực thứ nhất
+và thứ hai: tìm hai tham số $\zeta_1, \zeta_2$ của \eqref{eq:burgers-param} từ
+các điểm đo rời rạc có nhiễu, \emph{không} được cho điều kiện đầu lẫn điều kiện
+biên --- đúng thiết lập của Ví dụ~\ref{vd:burgers-inverse}. Và nó hỏi điều mà Ví
+dụ ấy mới chỉ khẳng định: \emph{so với một phương pháp cổ điển được cho cùng
+thông tin, PINN có thật sự hơn không?}
+\end{thinghiem}
+
+\textbf{Thiết lập.} Dữ liệu gồm $N_u = 2\,000$ điểm $(x, t)$ rút ngẫu nhiên,
+không lặp, từ lưới $2\,049\times201$ của nghiệm tham chiếu ở Mục~\ref{sec:tn5};
+giá trị đo là $u + \sigma\,\mathrm{std}(u)\,\xi$ với $\xi \sim \mathcal N(0, 1)$
+và $\sigma \in \{0;\ 0{,}01\}$, cùng một tập điểm cho cả hai mức nhiễu. Cấu hình
+PINN lấy đúng theo mã nguồn gốc của Raissi và cộng sự~\cite{raissi2019}, đã
+được đối chiếu trực tiếp: mạng tám lớp ẩn hai mươi nơ-ron, $\zeta_1$ khởi tạo
+bằng $0$, $\log\zeta_2$ khởi tạo bằng $-6$, và phần dư tính tại chính $2\,000$
+điểm đo. Ba đối thủ dùng \emph{cùng} dữ liệu (Bảng~\ref{tab:tn11-doithu}).
+
+\begin{table}[H]
+\centering
+\caption[Ba đối thủ của bài toán ngược]{Ba đối thủ của
+Thí nghiệm~\ref{tn:nguoc}. B và C dùng chính lược đồ của nghiệm tham chiếu (sai
+phân trung tâm dạng bảo toàn, Runge--Kutta bậc bốn tường minh) trên lưới thô
+hơn: $N_x = 1\,023$ là cấu hình chính, $N_x = 511$ là cấu hình phụ.}
+\label{tab:tn11-doithu}
+\footnotesize
+\begin{tabular}{@{}l l p{5.2cm} l@{}}
+\toprule
+\textbf{Đối thủ} & \textbf{Biết đầu/biên?} & \textbf{Ẩn số} & \textbf{Gradient} \\
+\midrule
+A: PINN & không & $3\,021$ trọng số mạng, $\zeta_1$, $\zeta_2$
+  & vi phân tự động \\
+C: liên hợp rời rạc & không & $\zeta_1$, $\zeta_2$, $u(x, 0)$ (spline $33$ nút),
+  $u(\pm1, t)$ (hai spline $11$ nút): $57$ ẩn & liên hợp viết tay \\
+B: cổ điển đủ thông tin & có & $\zeta_1$, $\zeta_2$ & liên hợp viết tay \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A tối ưu bằng $2\,000$ vòng Adam rồi tối đa năm đợt L-BFGS, mỗi đợt $2\,000$
+vòng, như các mục trước. B và C tối ưu bằng L-BFGS-B, dừng theo tiêu chí hội tụ
+chặt của mã gốc ($\mathrm{ftol}$ cỡ epsilon máy). Gradient của C theo cả $57$ ẩn
+số lấy bằng một lượt quét xuôi và một lượt quét ngược liên hợp qua từng bước
+Runge--Kutta; chi phí khoảng ba lần một lần giải thuận và không phụ thuộc số ẩn.
+Bản cài đặt được đối chiếu với vi phân tự động của PyTorch và khớp tới
+$10^{-16}$. Lược đồ tường minh còn buộc phải chặn trên $\zeta_2 \le 0{,}01$ để
+chọn được bước thời gian ổn định --- một ràng buộc PINN không cần; trong $40$ lần
+chạy cổ điển, chặn ấy chưa lần nào bị chạm và lược đồ chưa lần nào mất ổn định.
+
+\textbf{Giả thuyết, ghi và commit trong mã nguồn trước khi chạy.}
+(H1) PINN, dữ liệu sạch: sai số tương đối của $\zeta_2$ dưới $1\%$ ở cả năm hạt
+giống. (H2) PINN, nhiễu $1\%$: dưới $5\%$ ở cả năm. (H3) Ví
+dụ~\ref{vd:burgers-inverse} viết ``sai số của $\zeta_2$ \emph{luôn} lớn hơn sai
+số của $\zeta_1$ \emph{khoảng một bậc}'': kiểm bằng
+$\mathrm{err}(\zeta_2) > \mathrm{err}(\zeta_1)$ ở ít nhất chín trên mười lần chạy
+PINN, và trung vị tỉ số nằm trong $[3;\ 30]$. (H4) Mục~\ref{subsec:thuan-nguoc}
+gọi cách làm của PINN là ``ưu thế nổi bật so với các phương pháp bài toán ngược
+cổ điển'': kiểm bằng so sánh cùng thông tin A với C ($N_x = 1\,023$) --- (H4a)
+trung vị sai số $\zeta_2$ của PINN nhỏ hơn ở cả hai mức nhiễu; (H4b) trung vị
+thời gian của PINN ngắn hơn ở cả hai mức nhiễu.
+
+\begin{table}[H]
+\centering
+\caption[Kết quả bài toán ngược]{Kết quả của Thí nghiệm~\ref{tn:nguoc}, trung vị
+trên năm hạt giống; khoảng $[\min;\max]$ của sai số $\zeta_2$ tính theo phần
+trăm. Sai số trường là sai số $L^2$ tương đối của $u$ tái dựng trên toàn lưới
+tham chiếu. Cột thời gian ghi hai con số: lúc $\zeta_2$ đã ổn định trong $\pm1\%$
+quanh giá trị cuối, và lúc thuật toán dừng. Mỗi lần chạy dùng riêng một lõi
+CPU. Công trình gốc~\cite{raissi2019} báo cáo một lần chạy: $0{,}09\%$ và
+$0{,}12\%$ (sạch), $0{,}04\%$ và $0{,}84\%$ (nhiễu $1\%$).}
+\label{tab:tn11}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l l l l r@{}}
+\toprule
+\textbf{Đối thủ} & \textbf{sai số $\zeta_1$} & \textbf{sai số $\zeta_2$}
+  & \textbf{sai số trường} & \textbf{giây: ổn định / dừng} \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{dữ liệu sạch}} \\
+PINN (A) & $0{,}013\%$ & $0{,}29\%$ $[0{,}025;\ 1{,}81]$ & $2{,}4\times10^{-3}$ & $109$ / $253$ \\
+liên hợp, $N_x = 1\,023$ (C) & $0{,}006\%$ & $0{,}89\%$ $[0{,}60;\ 1{,}09]$ & $4{,}7\times10^{-4}$ & $43$ / $309$ \\
+liên hợp, $N_x = 511$ (C) & $0{,}009\%$ & $4{,}36\%$ $[3{,}85;\ 4{,}81]$ & $1{,}7\times10^{-3}$ & $17$ / $128$ \\
+biết đầu/biên, $N_x = 1\,023$ (B) & $0{,}003\%$ & $0{,}82\%$ $[0{,}62;\ 1{,}02]$ & $4{,}4\times10^{-4}$ & $17$ / $17$ \\
+biết đầu/biên, $N_x = 511$ (B) & $0{,}010\%$ & $4{,}22\%$ $[3{,}85;\ 4{,}47]$ & $1{,}7\times10^{-3}$ & $7$ / $7$ \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{nhiễu $1\%$}} \\
+PINN (A) & $0{,}082\%$ & $0{,}49\%$ $[0{,}011;\ 1{,}11]$ & $2{,}3\times10^{-3}$ & $142$ / $257$ \\
+liên hợp, $N_x = 1\,023$ (C) & $0{,}043\%$ & $0{,}38\%$ $[0{,}24;\ 0{,}73]$ & $2{,}9\times10^{-3}$ & $34$ / $1\,229$ \\
+liên hợp, $N_x = 511$ (C) & $0{,}030\%$ & $4{,}04\%$ $[3{,}40;\ 4{,}37]$ & $3{,}4\times10^{-3}$ & $17$ / $487$ \\
+biết đầu/biên, $N_x = 1\,023$ (B) & $0{,}027\%$ & $0{,}41\%$ $[0{,}26;\ 1{,}16]$ & $5{,}2\times10^{-4}$ & $9$ / $17$ \\
+biết đầu/biên, $N_x = 511$ (B) & $0{,}016\%$ & $3{,}92\%$ $[3{,}13;\ 4{,}66]$ & $1{,}7\times10^{-3}$ & $7$ / $7$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Images/chap_5/fig510_tn11.pdf}
+\caption[Bài toán ngược: PINN so với phương pháp liên hợp]{Thí
+nghiệm~\ref{tn:nguoc}. (a), (b) Sai số tương đối của $\zeta_2$; mỗi chấm là một
+hạt giống. Sai số của hai phương pháp cổ điển gần như chỉ phụ thuộc lưới: khoảng
+$4\%$ ở $N_x = 511$ và dưới $1\%$ ở $N_x = 1\,023$, dù có biết điều kiện đầu và
+biên hay không. (c) Thời gian: chấm đặc là lúc $\zeta_2$ đã ổn định, chấm rỗng
+là lúc dừng. Phương pháp liên hợp có câu trả lời sớm hơn PINN, rồi dùng phần lớn
+thời gian còn lại để khớp nhiễu vào $55$ hệ số của điều kiện đầu và biên.}
+\label{fig:tn11}
+\end{figure}
+
+\textbf{Kết quả theo giả thuyết.}
+
+\emph{H1 không đạt, H2 đạt.} PINN tìm được $\zeta_2$ với sai số trung vị
+$0{,}29\%$ trên dữ liệu sạch và $0{,}49\%$ trên dữ liệu nhiễu, còn $\zeta_1$ gần
+như chính xác ($0{,}013\%$ và $0{,}082\%$). Nhưng một trong năm hạt giống cho
+$1{,}81\%$ trên dữ liệu sạch, nên H1 không đạt; bốn hạt giống còn lại đều dưới
+$0{,}4\%$. Hai con số một lần chạy của công trình gốc, $0{,}12\%$ và $0{,}84\%$,
+nằm gọn trong khoảng đo được ở đây: kết quả của Raissi và cộng sự \emph{tái lập
+được}, và khoảng ấy cho biết một lần chạy đơn lẻ có thể rơi vào đâu.
+
+\emph{H3 không đạt.} Tỉ số $\mathrm{err}(\zeta_2)/\mathrm{err}(\zeta_1)$ có trung
+vị $24{,}5$ --- vậy ``khoảng một bậc'' là đúng \emph{về trung vị} --- nhưng chỉ
+lớn hơn $1$ ở tám trên mười lần chạy; ở hai lần còn lại, $\zeta_1$ lại sai nhiều
+hơn. Chữ ``luôn'' vì vậy sai. Đáng chú ý hơn: chính hai con số mà Ví
+dụ~\ref{vd:burgers-inverse} dẫn ra để rút kết luận ấy, $0{,}09\%$ và $0{,}12\%$
+trên dữ liệu sạch, chỉ chênh nhau $1{,}3$ lần. Kết luận đã được khái quát hoá từ
+một cặp số, trong đó một số không ủng hộ nó.
+
+\emph{H4a không đạt, H4b đạt --- nhưng H4b đo sai thứ.} Về độ chính xác, kết quả
+chia đôi: trên dữ liệu sạch PINN chính xác hơn ($0{,}29\%$ so với $0{,}89\%$),
+trên dữ liệu nhiễu thì phương pháp liên hợp chính xác hơn ($0{,}38\%$ so với
+$0{,}49\%$) và ít phân tán hơn hẳn. Về thời gian, tiêu chí đã đăng ký --- thời
+gian tới khi dừng --- cho PINN thắng ở cả hai mức nhiễu ($253$ so với $309$ giây,
+$257$ so với $1\,229$ giây), nên H4b đạt. Nhưng Hình~\ref{fig:tn11}(c) cho thấy
+tiêu chí ấy đo \emph{tiêu chí dừng} chứ không đo \emph{tốc độ tìm ra đáp số}:
+$\zeta_2$ của phương pháp liên hợp đã ổn định sau $34$--$43$ giây, và phần lớn
+thời gian còn lại là để khớp nhiễu vào hệ số của điều kiện đầu và biên với ngưỡng
+dừng cỡ epsilon máy. Tính theo lúc $\zeta_2$ ổn định --- một phép đo thêm vào
+\emph{sau} khi thấy số liệu, nên chỉ được đọc như mô tả --- phương pháp liên hợp
+nhanh hơn PINN từ $2{,}5$ tới $4{,}2$ lần.
+
+\textbf{Những gì bảng không nói.} Ba quan sát bổ sung giúp đọc kết quả cho đúng.
+
+\emph{Sai số của phương pháp cổ điển là sai số lưới.} Ở cả hai mức nhiễu, sai số
+$\zeta_2$ của B và C gần như trùng nhau, và giảm năm lần (dữ liệu sạch) tới mười
+lần (dữ liệu nhiễu) khi lưới mịn gấp đôi; với dữ liệu sạch, hệ số năm phù hợp
+với bậc hai của lược đồ. Có biết điều kiện đầu và biên hay không gần như
+không ảnh hưởng tới độ chính xác; nó chỉ ảnh hưởng tới \emph{thời gian}: $17$
+giây khi biết, so với $34$--$43$ giây tới khi $\zeta_2$ ổn định và vài trăm tới
+vài nghìn giây tới khi dừng khi không biết. Làm mịn lưới thêm một lần nữa sẽ hạ
+sai số cổ điển xuống dưới PINN, nhưng lưới $N_x = 2\,047$ chính là lưới sinh ra
+dữ liệu --- một ``tội ác bài toán ngược'' (\emph{inverse crime}) mà thí nghiệm cố
+ý tránh. Ở chiều ngược lại, phép so sánh vẫn hơi ưu ái phương pháp cổ điển, vì
+dữ liệu được sinh bằng chính lược đồ ấy trên lưới mịn hơn.
+
+\emph{PINN tái dựng trường nghiệm kém hơn, nhưng ổn định hơn.} Trên dữ liệu sạch,
+sai số trường của PINN ($2{,}4\times10^{-3}$) lớn gấp năm lần của phương pháp
+liên hợp ($4{,}7\times10^{-4}$). Trên dữ liệu nhiễu thì hai bên ngang nhau về
+trung vị, nhưng một lần chạy liên hợp (hạt giống $3$) cho sai số trường
+$4{,}4\times10^{-2}$ trong khi vẫn tìm đúng $\zeta_2$: với $55$ hệ số tự do cho
+điều kiện đầu và biên, nó đã khớp cả nhiễu vào biên. PINN không có lần chạy nào
+như vậy.
+
+\emph{Cái giá thật của phương pháp cổ điển là công sức, không phải thời gian
+chạy.} Hàm mục tiêu của PINN cho bài toán ngược dài bảy dòng mã, khác bài toán
+thuận đúng ở hai tham số được thêm vào. Bộ máy liên hợp dài $133$ dòng mã, cần
+thêm một bộ kiểm gradient để tin được, một chặn trên cho $\zeta_2$ vì ổn định, và
+một cơ chế xử lý khi lược đồ nổ nghiệm --- tất cả đều phải viết lại nếu đổi
+phương trình.
+
+\begin{nhanxet}[Ưu thế của PINN trong bài toán ngược: rẻ để viết, không rẻ để
+chạy]
+\label{nx:doc-tn11}
+Thí nghiệm~\ref{tn:nguoc} là lần duy nhất báo cáo đặt PINN vào đúng động lực của
+nó và cho nó một đối thủ được cho cùng thông tin. Kết quả không ủng hộ cách nói
+``ưu thế nổi bật'' ở Mục~\ref{subsec:thuan-nguoc}, cũng không ủng hộ lý do được
+nêu ở đó. Cả hai phương pháp đều lặp: PINN đánh giá hàm mục tiêu khoảng
+$13\,600$ lần, phương pháp liên hợp giải bài toán thuận và bài toán liên hợp vài
+trăm tới vài nghìn lần. Khi đã có bộ máy liên hợp, phương pháp cổ điển đạt độ
+chính xác cùng bậc --- tốt hơn trên dữ liệu nhiễu, kém hơn trên dữ liệu sạch vì
+sai số lưới --- và có câu trả lời sớm hơn; khi biết đủ điều kiện, nó nhanh hơn
+PINN từ sáu tới mười lăm lần, tuỳ tính tới lúc $\zeta_2$ ổn định hay tới lúc
+dừng.
+
+Ưu thế thật của PINN nằm ở chỗ khác, và đo được: nó cho một phương pháp bài toán
+ngược \emph{gần như miễn phí về công sức} --- không rời rạc hoá, không bước thời
+gian, không ràng buộc ổn định, không phải suy ra và kiểm chứng một bài toán liên
+hợp --- và nó xử lý điều kiện đầu và biên khuyết mà không cần đổi một dòng nào.
+Đó là ưu thế về \emph{chi phí xây dựng} phương pháp, không phải về chi phí tính
+toán hay độ chính xác. Với một phương trình một chiều đã có sẵn bộ giải, ưu thế
+ấy nhỏ; với một hệ phương trình mà việc viết bộ giải liên hợp tốn hàng tháng,
+nó có thể quyết định.
+
+Phạm vi: một phương trình, hai tham số, $N_u = 2\,000$, hai mức nhiễu, $n = 5$;
+phương pháp cổ điển được cài đặt bởi chính người viết báo cáo, với các lựa chọn
+(số nút spline, tiêu chí dừng) lấy theo mặc định hợp lý chứ không được dò. Kết
+luận về tốc độ thuộc về bài toán một chiều, nơi một lần giải thuận chỉ tốn chưa
+tới một giây; ở bài toán mà một lần giải thuận đã đắt, lợi thế có thể đảo chiều.
+\end{nhanxet}
+
+%==============================================================================
 \section{Đối chiếu lý thuyết và thực nghiệm}
 \label{sec:doi-chieu}
 %==============================================================================
@@ -2243,20 +2454,30 @@ Nhận xét~\ref{nx:chi-phi-bac-cao}
 & đồ thị tối ưu dài gấp $4$--$6$ lần đồ thị xuôi
 & trung vị $8{,}4$, khoảng $[4{,}6;\ 9{,}4]$; nhiễu đo chỉ kéo tỉ số xuống nên
   ước lượng ít chệch nhất là $\approx 9$
-& \textbf{Ước lượng thấp}, cần sửa (Mục~\ref{sec:tn9})
+& \textbf{Ước lượng thấp}, cần sửa (Mục~\ref{sec:tn9}) \\[4pt]
+Ví dụ~\ref{vd:burgers-inverse}
+& sai số $\zeta_2$ \emph{luôn} lớn hơn sai số $\zeta_1$ khoảng một bậc
+& $8/10$ lần chạy; trung vị tỉ số $24{,}5$; hai lần ngược lại
+& \textbf{Cần siết lại}: ``thường'', không ``luôn'' (Mục~\ref{sec:tn11}) \\[4pt]
+Mục~\ref{subsec:thuan-nguoc}
+& ưu thế nổi bật so với phương pháp bài toán ngược cổ điển
+& cùng thông tin: PINN chính xác hơn trên dữ liệu sạch, kém hơn trên dữ liệu
+  nhiễu, chậm hơn $2{,}5$--$4{,}2$ lần tới khi $\zeta_2$ ổn định
+& \textbf{Cần siết lại}: ưu thế ở công sức xây dựng, không ở tính toán
+  (Nhận xét~\ref{nx:doc-tn11})
 \end{longtable}
 \endgroup
  
-Trong mười bốn hạng mục: sáu khớp trọn vẹn, hai khớp về hướng nhưng không về độ
-lớn, \emph{bốn} cần siết lại cách phát biểu, một không tái lập được trên năm hạt
+Trong mười sáu hạng mục: sáu khớp trọn vẹn, hai khớp về hướng nhưng không về độ
+lớn, \emph{sáu} cần siết lại cách phát biểu, một không tái lập được trên năm hạt
 giống, và một cho kết quả tiêu cực nhưng đã truy được nguyên nhân.
 
 Mức khớp này ủng hộ khung lý thuyết của Chương~\ref{chap:pinn} một cách
-\emph{có điều kiện}, và điều kiện ấy hiện ra rất rõ khi xếp mười bốn hạng mục
+\emph{có điều kiện}, và điều kiện ấy hiện ra rất rõ khi xếp mười sáu hạng mục
 theo \emph{nguồn gốc} của phát biểu thay vì theo kết quả.
 
-Trong mười bốn hạng mục, \emph{sáu} là mệnh đề đã được chứng minh trong báo cáo
-và \emph{tám} thì không. Ranh giới giữa hai nhóm ấy giải thích gần như toàn bộ
+Trong mười sáu hạng mục, \emph{sáu} là mệnh đề đã được chứng minh trong báo cáo
+và \emph{mười} thì không. Ranh giới giữa hai nhóm ấy giải thích gần như toàn bộ
 bảng.
 
 \emph{Nhóm thứ nhất --- sáu mệnh đề đã chứng minh --- không có cái nào bị số
@@ -2267,18 +2488,18 @@ Mệnh đề~\ref{md:phat-bien-phat} và Mệnh đề~\ref{md:chan-suy-bien} ---
 \emph{hướng} ở mọi hạt giống và mọi giá trị $\nu$; cái phải sửa ở cả hai là
 \emph{cách đọc}, không phải nội dung.
 
-\emph{Nhóm thứ hai --- tám hạng mục không phải mệnh đề --- thì phân hoá.} Hai
+\emph{Nhóm thứ hai --- mười hạng mục không phải mệnh đề --- thì phân hoá.} Hai
 khớp trọn vẹn: quan sát rằng $\lambda_b$ tối ưu là hữu hạn, và
 Nhận xét~\ref{rem:ntk-view} về thứ tự học của hồi quy. Một là \emph{chế độ hỏng
 tìm được} của một thuật toán trong tài liệu, và chính nó sinh ra
-Bổ đề~\ref{bd:phan-hoi-duong}. \emph{Năm} hạng mục còn lại phải điều chỉnh.
+Bổ đề~\ref{bd:phan-hoi-duong}. \emph{Bảy} hạng mục còn lại phải điều chỉnh.
 
-Cộng cả hai nhóm: \emph{bảy hạng mục} phải điều chỉnh --- hai cách đọc mệnh đề
-và năm phát biểu không phải mệnh đề. Trong toàn bộ chương thực nghiệm, chứng
+Cộng cả hai nhóm: \emph{chín hạng mục} phải điều chỉnh --- hai cách đọc mệnh đề
+và bảy phát biểu không phải mệnh đề. Trong toàn bộ chương thực nghiệm, chứng
 minh chưa một lần thất bại; chỉ có suy đoán thất bại.
 
-Bảy hạng mục ấy mang \emph{tám} khiếm khuyết, vì giả thuyết
-\eqref{eq:pho-hieu-dung} mắc cả hai kiểu cùng lúc. Tám khiếm khuyết chia thành
+Chín hạng mục ấy mang \emph{mười} khiếm khuyết, vì giả thuyết
+\eqref{eq:pho-hieu-dung} mắc cả hai kiểu cùng lúc. Mười khiếm khuyết chia thành
 bốn kiểu suy luận yếu hơn.
 
 \emph{(i) Đối chiếu một số mũ đo ở ngân sách hữu hạn với số mũ tiệm cận.} Đây là
@@ -2298,14 +2519,20 @@ về chiều biến thiên của $\rho_b$ trên bài toán lành mạnh chỉ đ
 giống; và tỉ số $\abs{c_1}/\abs{c_8} = 38{,}6$ đo cho
 giả thuyết \eqref{eq:pho-hieu-dung} thuộc đuôi hiếm của một phân bố có trung vị
 $5{,}5$ (Mục~\ref{sec:tn8}). Chính chỗ cuối này là khiếm khuyết thứ hai của
-\eqref{eq:pho-hieu-dung}.
+\eqref{eq:pho-hieu-dung}. Câu ``sai số của $\zeta_2$ luôn lớn hơn sai số của
+$\zeta_1$ khoảng một bậc'' ở Ví dụ~\ref{vd:burgers-inverse} cũng thuộc kiểu này,
+ở dạng cực đoan hơn: nó được rút từ một cặp số của một lần chạy, mà một trong hai
+số không ủng hộ nó (Mục~\ref{sec:tn11}).
 
-\emph{(iv) Ước lượng bậc độ lớn không được kiểm chứng}: Nhận xét~\ref{nx:chi-phi-bac-cao}
-đoán bội số $4$--$6$ trong khi đo được khoảng $9$ (Mục~\ref{sec:tn9}).
+\emph{(iv) Phát biểu định lượng hay so sánh chưa từng được đo}: Nhận
+xét~\ref{nx:chi-phi-bac-cao} đoán bội số $4$--$6$ trong khi đo được khoảng $9$
+(Mục~\ref{sec:tn9}); và Mục~\ref{subsec:thuan-nguoc} gọi PINN là có ``ưu thế nổi
+bật'' so với phương pháp cổ điển mà chưa từng đặt hai phương pháp cạnh nhau
+(Mục~\ref{sec:tn11}).
 
 Đáng chú ý là cả bốn kiểu đều \emph{không} bị phát hiện bởi một lần chạy. Ba
-kiểu đầu cần nhiều hạt giống; kiểu thứ tư cần lặp phép đo thời gian. Không kiểu
-nào đòi hỏi thêm lý thuyết.
+kiểu đầu cần nhiều hạt giống; kiểu thứ tư cần một phép đo --- lặp phép đo thời
+gian, hoặc dựng một đối thủ. Không kiểu nào đòi hỏi thêm lý thuyết.
 
 Đây là bài học phương pháp luận của chương, và nó nhất quán với ranh giới mà
 Chương~\ref{chap:fnn} đã vạch giữa lý thuyết xấp xỉ và lý thuyết tối ưu: những gì
@@ -2450,18 +2677,18 @@ PINN. Muốn tách riêng tầng thứ nhất cần một cách khác --- chẳn
 \emph{nhân tạo} theo hướng hàm riêng $\sin\pi x$ rồi đo trực tiếp tỉ số, thay vì
 để quá trình huấn luyện quyết định hướng của sai số.
 
-\item \emph{Mọi bài toán thực nghiệm đều nằm ngoài ba động lực của
-Mục~\ref{subsec:gioi-han-co-dien}.} Mọi bài toán trong chương này đều là bài
-toán \emph{thuận}, một chiều theo không gian, với dữ liệu biên và dữ liệu đầu
-cho đầy đủ và không nhiễu --- tức không chạm tới bài toán ngược, không chạm tới
-điều kiện biên khuyết, và không chạm tới lời nguyền số chiều. Đây chính là chế
-độ mà phương pháp lưới cổ điển gần như tối ưu, và Mục~\ref{sec:tn9} đo được cái
-giá của việc đó: chậm hơn khoảng $1{,}8\times10^{4}$ lần ở cùng mức sai số. Hệ quả cho cách đọc
-chương này: các thí nghiệm ở đây kiểm chứng \emph{cơ chế} của PINNs --- vai trò
-hàm kích hoạt, cái giá của ràng buộc mềm, thiên kiến phổ, bệnh lý gradient, các
-chặn ổn định --- chứ không kiểm chứng \emph{tính cạnh tranh} của phương pháp.
-Muốn kiểm chứng điều sau cần ít nhất một bài toán nhiều chiều hoặc một bài toán
-ngược, là hướng nêu ở Chương~\ref{chap:ketluan}.
+\item \emph{Chỉ một trong ba động lực của Mục~\ref{subsec:gioi-han-co-dien}
+được thực nghiệm, và ở dạng hẹp.} Mười thí nghiệm đầu đều là bài toán
+\emph{thuận}, một chiều theo không gian, với dữ liệu biên và dữ liệu đầu cho
+đầy đủ và không nhiễu --- đúng chế độ mà phương pháp lưới cổ điển gần như tối
+ưu, và Mục~\ref{sec:tn9} đo được cái giá của việc đó: chậm hơn khoảng
+$1{,}8\times10^{4}$ lần ở cùng mức sai số. Các thí nghiệm ấy kiểm chứng \emph{cơ
+chế} của PINNs --- vai trò hàm kích hoạt, cái giá của ràng buộc mềm, thiên kiến
+phổ, bệnh lý gradient, các chặn ổn định --- chứ không kiểm chứng \emph{tính cạnh
+tranh} của phương pháp. Mục~\ref{sec:tn11} lấp một phần khoảng trống: một bài
+toán ngược với điều kiện đầu và biên khuyết, đặt cạnh một đối thủ cổ điển cùng
+thông tin. Nhưng đó là một phương trình, hai tham số và một chiều không gian;
+động lực thứ ba --- lời nguyền số chiều --- vẫn hoàn toàn chưa được chạm tới.
 \end{enumerate}
  
 %==============================================================================
@@ -2523,7 +2750,17 @@ cũng không khá hơn, và cả ba chiến lược thích nghi đều làm vùn
 mười lăm trên mười lăm lần so sánh (Nhận xét~\ref{nx:lay-mau}). Và kết quả ấy chỉ thu hẹp
 khoảng cách chi phí $1{,}6$ lần --- vẫn bốn bậc độ lớn.
 
-Hai kết quả cuối cùng ấy minh hoạ đúng vai trò của chương: bước kiểm chứng số không
+Mục~\ref{sec:tn11} là lần duy nhất chương này đặt PINN vào đúng động lực của nó:
+một bài toán ngược không có điều kiện đầu và biên, cạnh một đối thủ cổ điển được
+cho cùng thông tin. PINN tìm được độ nhớt với sai số trung vị $0{,}29\%$ (dữ liệu
+sạch) và $0{,}49\%$ (nhiễu $1\%$), tái lập được kết quả của công trình gốc. Nhưng
+phương pháp liên hợp rời rạc đạt độ chính xác cùng bậc và có câu trả lời sớm hơn
+$2{,}5$ tới $4{,}2$ lần; ưu thế của PINN hoá ra nằm ở công sức xây dựng phương pháp
+--- bảy dòng mã so với $133$ --- chứ không ở chi phí tính toán
+(Nhận xét~\ref{nx:doc-tn11}). Thí nghiệm này cũng buộc phải siết lại hai phát biểu
+của Chương~\ref{chap:pinn}.
+
+Các kết quả cuối cùng ấy minh hoạ đúng vai trò của chương: bước kiểm chứng số không
 chỉ xác nhận hay bác bỏ lý thuyết đã có, mà còn chỉ ra chỗ lý thuyết cần được bổ
 sung -- và chỉ ra cả chỗ mà chính chương thực nghiệm đã kết luận vội.
  

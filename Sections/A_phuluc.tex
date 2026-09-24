@@ -12,15 +12,26 @@ biết để tái lập kết quả.
 \section{Cấu trúc và cách chạy}
 %==============================================================================
 
-\begin{table}[H]
-\centering
-\caption{Tổ chức thư mục \texttt{code/}.}
-\label{tab:code-struct}
+\begingroup
 \small
-\begin{tabular}{@{}l p{9.2cm}@{}}
+\setlength{\LTcapwidth}{\textwidth}
+\begin{longtable}{@{}l p{9.2cm}@{}}
+\caption{Tổ chức thư mục \texttt{code/}.}
+\label{tab:code-struct} \\
 \toprule
 \textbf{Tệp} & \textbf{Nội dung} \\
 \midrule
+\endfirsthead
+\multicolumn{2}{@{}l}{\emph{Bảng~\thetable{} (tiếp theo)}} \\
+\toprule
+\textbf{Tệp} & \textbf{Nội dung} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r@{}}{\emph{(xem tiếp trang sau)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
 \texttt{pinns/core.py} & Thành phần dùng chung: lớp \texttt{FNN}, toán tử đạo
   hàm lồng nhau \texttt{grad}, chỉ tiêu sai số, chỉ số mất cân bằng
   $\rho_i$, và hai giai đoạn huấn luyện Adam~$\to$~L-BFGS. \\
@@ -48,13 +59,18 @@ biết để tái lập kết quả.
 \texttt{pinns/exp10c\_rad.py} & Mục~\ref{sec:tn10}, biến thể lấy mẫu lại toàn
   bộ (RAD) với $c = 1$ và $c = 0$, rẽ từ cùng trạng thái như
   \texttt{exp10b} \\
-\texttt{pinns/animate.py} & Hoạt hình quá trình huấn luyện (TN1, TN3, TN10) ra
-  GIF và PDF nhiều trang cho slide, cùng Hình~\ref{fig:tn10} \\
-\texttt{pinns/run\_all.py} & Chạy lần lượt cả mười thí nghiệm \\
+\texttt{pinns/exp11\_nguoc.py} & Mục~\ref{sec:tn11}, bài toán ngược: PINN và hai
+  đối thủ cổ điển trên cùng dữ liệu; giả thuyết ghi ở đầu tệp trước khi chạy \\
+\texttt{pinns/lienhop\_burgers.py} & Bộ giải sai phân với điều kiện đầu và biên là
+  ẩn số, gradient bằng phương pháp liên hợp rời rạc viết tay; tự kiểm khớp vi phân
+  tự động tới $10^{-16}$ khi chạy trực tiếp \\
+\texttt{pinns/animate.py} & Hoạt hình quá trình huấn luyện (TN1, TN3, TN10,
+  TN11) ra GIF và PDF nhiều trang cho slide, cùng
+  Hình~\ref{fig:tn10}, \ref{fig:tn10b}, \ref{fig:tn10c} và \ref{fig:tn11} \\
+\texttt{pinns/run\_all.py} & Chạy lần lượt cả mười một thí nghiệm \\
 \texttt{results/*.json} & Số liệu thô của từng thí nghiệm \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+\endgroup
 
 Mỗi thí nghiệm chạy độc lập bằng một lệnh dạng
 \texttt{python -m pinns.<tệp>}, còn \texttt{python -m pinns.run\_all}

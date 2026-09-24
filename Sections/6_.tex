@@ -70,6 +70,16 @@ không chiến lược nào cải thiện nhất quán sai số toàn cục, và
 trơn tệ đi ở mọi hạt giống: ở cấu hình này, cách đặt điểm phối trí chỉ phân phối
 lại sai số giữa các vùng.
 
+Mục~\ref{sec:tn11} là thí nghiệm duy nhất đặt PINN vào một trong ba động lực kể
+trên --- bài toán ngược với điều kiện đầu và biên khuyết --- và cho nó một đối thủ
+cổ điển được cho cùng thông tin. PINN tìm được độ nhớt với sai số trung vị dưới
+$0{,}5\%$ ở cả hai mức nhiễu, không cần điều kiện đầu hay biên. Phương pháp liên
+hợp rời rạc cũng làm được điều đó, với độ chính xác cùng bậc và nhanh hơn tới khi
+có đáp số; cái nó cần thêm là $133$ dòng mã liên hợp phải tự suy ra và kiểm
+chứng. Ưu thế của PINN ở động lực thứ nhất vì vậy là ưu thế về công sức, và việc
+nó quyết định hay không tuỳ vào việc viết bộ giải liên hợp cho bài toán đang xét
+khó tới đâu (Nhận xét~\ref{nx:doc-tn11}).
+
 \paragraph{MT5 --- Khảo sát độ nhạy và phân tích hạn chế.}
 Đã hoàn thành ở mức tương xứng với ngân sách tính toán, nhưng đây cũng là nhiệm
 vụ còn nhiều dư địa nhất; Mục~\ref{sec:hanche} đã nêu thẳng chín hạn chế của chính
@@ -95,14 +105,14 @@ tái lập được, có thể dùng làm điểm khởi đầu cho các nghiên
 
 \emph{Thứ ba}, một phân tích đối chiếu có hệ thống giữa lý thuyết và số liệu
 (Bảng~\ref{tab:doi-chieu}). Phần đối chiếu này cho một kết luận phương pháp luận
-đáng chú ý: trong mười bốn hạng mục, \emph{không} một mệnh đề đã chứng minh nào
-bị số liệu bác bỏ. Cả bảy hạng mục phải điều chỉnh đều đến từ bốn kiểu suy luận
+đáng chú ý: trong mười sáu hạng mục, \emph{không} một mệnh đề đã chứng minh nào
+bị số liệu bác bỏ. Cả chín hạng mục phải điều chỉnh đều đến từ bốn kiểu suy luận
 yếu hơn --- đối chiếu một số mũ đo ở ngân sách hữu hạn với số mũ tiệm cận, ghép
-hai kết quả rời rạc, khái quát hoá từ một lần chạy duy nhất, và ước lượng bậc độ
-lớn chưa kiểm chứng.
+hai kết quả rời rạc, khái quát hoá từ một lần chạy duy nhất, và phát biểu định
+lượng hay so sánh chưa từng được đo.
 
-Bên cạnh ba đóng góp đã dự kiến, quá trình thực nghiệm sinh thêm năm kết quả
-không nằm trong kế hoạch ban đầu, và cả năm đều xuất phát từ \emph{kết quả tiêu
+Bên cạnh ba đóng góp đã dự kiến, quá trình thực nghiệm sinh thêm sáu kết quả
+không nằm trong kế hoạch ban đầu, và cả sáu đều xuất phát từ \emph{kết quả tiêu
 cực}:
 
 \begin{itemize}[leftmargin=*]
@@ -149,6 +159,15 @@ cực}:
       \emph{kết luận định tính vẫn đứng vững} --- điều bị loại bỏ chỉ là con số.
       Giá trị của kết quả này nằm ở \emph{quy trình}: chi phí của việc lặp năm
       hạt giống là chưa tới hai giờ máy, rẻ hơn hẳn cái giá của bốn con số sai.
+\item \textbf{Hai phát biểu về bài toán ngược được đặt đúng chỗ.}
+      Mục~\ref{sec:tn11} đặt PINN cạnh một phương pháp liên hợp rời rạc được cho
+      cùng thông tin. Chương~\ref{chap:pinn} từng gọi cách làm của PINN là ``ưu
+      thế nổi bật''; số đo cho thấy ưu thế ấy có thật nhưng nằm ở công sức xây
+      dựng --- bảy dòng mã so với $133$ --- còn về độ chính xác thì ngang ngửa, về
+      thời gian tới đáp số thì phương pháp liên hợp nhanh hơn
+      (Nhận xét~\ref{nx:doc-tn11}). Câu ``sai số $\zeta_2$ luôn lớn hơn sai số
+      $\zeta_1$ khoảng một bậc'' cũng chỉ đúng ở tám trên mười lần chạy. Cả hai
+      đều là phát biểu mà báo cáo tiếp nhận từ tài liệu và chưa từng tự kiểm.
 \end{itemize}
 
 %==============================================================================
@@ -165,7 +184,8 @@ những chứng minh được trình bày đầy đủ đều sơ cấp, và gi�
 biến những khẳng định mơ hồ thành phát biểu có giả thiết rõ ràng.
 
 Thứ hai, phạm vi bài toán hẹp: chỉ mô hình thời gian liên tục, chỉ mạng truyền
-thẳng kết nối đầy đủ, chỉ bài toán thuận, và chỉ các phương trình một chiều theo
+thẳng kết nối đầy đủ, gần như chỉ bài toán thuận --- bài toán ngược xuất hiện
+đúng một lần, với hai tham số vô hướng --- và chỉ các phương trình một chiều theo
 không gian. Lợi thế lý thuyết quan trọng nhất của mạng nơ-ron --- bậc xấp xỉ
 $\mathcal{O}(m^{-1/2})$ không phụ thuộc số chiều ở Định lý~\ref{dl:barron} ---
 vì vậy \emph{không} được kiểm chứng bằng thực nghiệm nào trong báo cáo. Phép đo
@@ -227,9 +247,11 @@ $\sin \pi x$ --- hướng làm chặn Poincaré trở nên chặt --- rồi đo 
 ấy theo $\nu$.
 
 \paragraph{Mở rộng phạm vi.} Cuối cùng, hai mở rộng nằm ngoài phạm vi báo cáo
-nhưng nối liền với nó: bài toán ngược, nơi khung hàm mất mát \eqref{eq:total-loss}
-đã sẵn sàng và chỉ cần thêm $\bzeta$ vào tập biến tối ưu
-(Mục~\ref{subsec:thuan-nguoc}); và bài toán nhiều chiều, nơi lập luận chống lời
+nhưng nối liền với nó: bài toán ngược mà tham số là một \emph{hàm} --- chẳng hạn
+hệ số nhớt $\nu(x)$ --- nơi Mục~\ref{sec:tn11} chỉ mới thử với hai số vô hướng, và
+nơi cả PINN lẫn phương pháp liên hợp đều có chi phí gradient không phụ thuộc số
+ẩn, nên phép so sánh sẽ xoay quanh điều kiện chỉnh hoá chứ không quanh chi phí;
+và bài toán nhiều chiều, nơi lập luận chống lời
 nguyền số chiều ở Nhận xét~\ref{nx:loi-nguyen} lần đầu tiên trở nên kiểm chứng
 được. Mở rộng thứ hai là mở rộng \emph{quyết định}, và Mục~\ref{sec:tn9} cho nó
 một tiêu chí sắc: lặp lại chính phép đo chi phí ấy khi $d$ tăng, rồi tìm giá trị

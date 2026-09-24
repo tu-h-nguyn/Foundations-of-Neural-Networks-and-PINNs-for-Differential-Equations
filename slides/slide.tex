@@ -216,8 +216,8 @@ Cân bằng trọng số chỉ chạm tầng giữa; nó không cứu được b
 \end{itemize}
 \end{column}
 \begin{column}{0.47\textwidth}
-\textbf{Mười thí nghiệm}
-\begin{itemize}\footnotesize
+\textbf{Mười một thí nghiệm}
+\begin{itemize}\scriptsize\setlength{\itemsep}{0pt}
 \item[TN1] hàm kích hoạt, ReLU
 \item[TN2] cái giá của ràng buộc mềm
 \item[TN3] thiên kiến phổ
@@ -228,6 +228,7 @@ Cân bằng trọng số chỉ chạm tầng giữa; nó không cứu được b
 \item[TN8] độ phân tán giữa hạt giống
 \item[TN9] chi phí tính toán
 \item[TN10] \alert{Burgers, áp dụng chính các biện pháp khắc phục}
+\item[TN11] \alert{bài toán ngược, PINN so với liên hợp rời rạc}
 \end{itemize}
 \end{column}
 \end{columns}
@@ -377,7 +378,7 @@ Chương 1 nêu \emph{ba} động lực cho PINNs: bài toán ngược, điều 
 lời nguyền số chiều.
 
 \smallskip
-\alert{Không động lực nào có mặt} trong lớp bài toán được thực nghiệm: thuận,
+\alert{Không động lực nào có mặt} trong TN1--TN10: thuận,
 đủ dữ liệu, $d = 1$ --- đúng chế độ mà sai phân hữu hạn gần như tối ưu.
 \end{block}
 \end{frame}
@@ -481,7 +482,57 @@ của bảng ba tầng.
 \end{frame}
 
 %==============================================================
-\begin{frame}{Đối chiếu lý thuyết và thực nghiệm: 14 hạng mục}
+\begin{frame}{TN11: bài toán ngược --- đặt PINN vào đúng động lực của nó}
+\footnotesize
+Tìm $\zeta_1, \zeta_2$ trong $u_t + \zeta_1 u u_x - \zeta_2 u_{xx} = 0$ từ
+$2\,000$ điểm đo, \alert{không biết điều kiện đầu và biên}. Đối thủ cổ điển được
+cho \emph{cùng} thông tin: sai phân + liên hợp rời rạc viết tay, đầu/biên là ẩn.
+
+\smallskip
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& sai số $\zeta_2$, sạch & sai số $\zeta_2$, nhiễu 1\% & giây tới khi $\zeta_2$ ổn định (sạch / nhiễu) \\
+\midrule
+PINN & \good{$0{,}29\%$} & $0{,}49\%$ & $109$ / $142$ \\
+Liên hợp, $N_x = 1\,023$ & $0{,}89\%$ & \good{$0{,}38\%$} & \good{$43$ / $34$} \\
+Cổ điển, \emph{biết} đầu/biên & $0{,}82\%$ & $0{,}41\%$ & $17$ / $9$ \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\scriptsize
+Giả thuyết ghi \alert{trước khi chạy}:\\
+H1 PINN sạch $< 1\%$ ở $5/5$: \bad{không} ($1{,}81\%$ ở một hạt)\\
+H2 PINN nhiễu $< 5\%$: \good{đạt}\\
+H3 ``$\zeta_2$ luôn sai hơn $\zeta_1$ một bậc'': \bad{không} ($8/10$)\\
+H4 PINN chính xác hơn / nhanh hơn: \bad{không} / \good{đạt}${}^{*}$
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{alertblock}{Rẻ để viết, không rẻ để chạy}
+\footnotesize PINN: \good{7 dòng mã}. Liên hợp: \bad{133 dòng}, kiểm gradient,
+chặn ổn định. Nhưng khi đã có, nó chính xác ngang và có đáp số sớm hơn.
+\end{alertblock}
+\end{column}
+\end{columns}
+
+\vspace{2pt}
+{\scriptsize ${}^{*}$ đạt theo thời gian tới khi dừng; theo lúc $\zeta_2$ ổn định
+thì liên hợp nhanh hơn $2{,}5$--$4{,}2$ lần.}
+\end{frame}
+
+%==============================================================
+\begin{frame}{Xem nó xảy ra: PINN tìm độ nhớt từ 2\,000 điểm đo}
+\centering
+\hoathinh[0.68\textheight]{tn11_nhan_dang}
+
+\footnotesize Hạt giống trung vị, nhiễu 1\%. $\zeta_1$ từ $0$ lên $1$; lớp sốc
+hiện ra từ các chấm đo rời rạc.
+\end{frame}
+
+%==============================================================
+\begin{frame}{Đối chiếu lý thuyết và thực nghiệm: 16 hạng mục}
 \begin{columns}[T]
 \begin{column}{0.46\textwidth}
 \small
@@ -489,7 +540,7 @@ của bảng ba tầng.
 \toprule
 Khớp trọn vẹn & \good{6} \\
 Khớp về hướng, không độ lớn & 2 \\
-Cần siết lại cách phát biểu & 4 \\
+Cần siết lại cách phát biểu & 6 \\
 Không tái lập được & 1 \\
 Có chế độ hỏng, đã truy nguyên & 1 \\
 \bottomrule
@@ -500,7 +551,7 @@ Có chế độ hỏng, đã truy nguyên & 1 \\
 \alert{Không một mệnh đề đã chứng minh nào bị số liệu bác bỏ.}
 
 \smallskip
-Cả bảy hạng mục phải điều chỉnh đều đến từ bốn kiểu \emph{suy luận yếu hơn}.
+Cả chín hạng mục phải điều chỉnh đều đến từ bốn kiểu \emph{suy luận yếu hơn}.
 \end{alertblock}
 \end{column}
 \end{columns}
@@ -515,27 +566,30 @@ Cả bảy hạng mục phải điều chỉnh đều đến từ bốn kiểu \
 \item Ghép hai kết quả rời rạc thành một giả thuyết
   \\{\footnotesize Giả thuyết phổ hiệu dụng nhân $\abs{P}^2$ với $\widehat{\varkappa}$.}
 \item Khái quát hoá từ \emph{một lần chạy}
-  \\{\footnotesize Tương quan $\rho_b$--$\norm{\bW^{(1)}}^2$; tỉ số $38{,}6$.}
-\item Ước lượng bậc độ lớn không được kiểm chứng
-  \\{\footnotesize Nhận xét 3.15 đoán $4$--$6$, đo được $\approx 9$.}
+  \\{\footnotesize Tương quan $\rho_b$--$\norm{\bW^{(1)}}^2$; tỉ số $38{,}6$;
+  ``sai số $\zeta_2$ \emph{luôn} lớn hơn $\zeta_1$ một bậc'' (đúng $8/10$).}
+\item Phát biểu định lượng hay so sánh chưa từng được đo
+  \\{\footnotesize Nhận xét 3.15 đoán $4$--$6$, đo được $\approx 9$; ``ưu thế nổi
+  bật'' của PINN ở bài toán ngược.}
 \end{enumerate}
 
 \medskip
 \centering
 \alert{Không kiểu nào bị phát hiện bởi một lần chạy.}\\
-Ba kiểu đầu cần nhiều hạt giống; kiểu thứ tư cần lặp phép đo thời gian.
+Ba kiểu đầu cần nhiều hạt giống; kiểu thứ tư cần một phép đo, hoặc một đối thủ.
 \end{frame}
 
 %==============================================================
 \begin{frame}{Hạn chế --- nói thẳng}
 \small
 \begin{itemize}
-\item \textbf{Phạm vi hẹp.} Chỉ bài toán thuận, một chiều, mạng truyền thẳng.
+\item \textbf{Phạm vi hẹp.} Gần như chỉ bài toán thuận (một bài toán ngược, hai
+  tham số), một chiều, mạng truyền thẳng.
   Lợi thế lý thuyết lớn nhất của mạng nơ-ron --- bậc xấp xỉ không phụ thuộc
   số chiều --- \alert{không được kiểm chứng bằng thực nghiệm nào}.
 
-\item \textbf{Mọi bài toán đều nằm ngoài ba động lực của Chương 1.}
-  Các thí nghiệm kiểm chứng \emph{cơ chế}, không kiểm chứng
+\item \textbf{Chỉ một trong ba động lực của Chương 1 được thử} (TN11, bài toán
+  ngược). TN1--TN10 kiểm chứng \emph{cơ chế}, không kiểm chứng
   \emph{tính cạnh tranh}.
 
 \item \textbf{$n = 5$ là ít.} Đủ cho trung vị và khoảng, chưa đủ cho một
@@ -558,8 +612,8 @@ và cùng cần thiết.
 \end{block}
 
 \begin{block}{Về thực nghiệm}
-Mười thí nghiệm với tiêu chí đặt trước. Kết quả tiêu cực được báo cáo đầy đủ ---
-ba trong số đó buộc phải siết lại chính các chương lý thuyết, và một dẫn tới
+Mười một thí nghiệm với tiêu chí đặt trước. Kết quả tiêu cực được báo cáo đầy đủ ---
+năm trong số đó buộc phải siết lại chính các chương lý thuyết, và một dẫn tới
 một bổ đề mới.
 \end{block}
 

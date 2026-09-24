@@ -53,6 +53,18 @@ for s in 0 1 2 3 4; do python -m pinns.exp10c_rad $s & done; wait
 python -m pinns.exp10c_rad tong_ket
 ```
 
+**TN11** — bài toán ngược: tìm ζ₁, ζ₂ của Burgers từ 2 000 điểm đo (nhiễu 0% và
+1%), không cho điều kiện đầu/biên, theo đúng mã gốc của Raissi và cs. Ba đối thủ
+trên cùng dữ liệu: PINN; sai phân + **phương pháp liên hợp rời rạc viết tay**
+(`lienhop_burgers.py`, điều kiện đầu/biên là ẩn số spline); và cổ điển biết đủ
+điều kiện. Giả thuyết ghi ở đầu `exp11_nguoc.py` trước khi chạy.
+
+```bash
+python -m pinns.lienhop_burgers                    # kiem gradient lien hop == autograd (1e-16)
+for s in 0 1 2 3 4; do python -m pinns.exp11_nguoc pinn $s; python -m pinns.exp11_nguoc codien $s; done
+python -m pinns.exp11_nguoc tong_ket
+```
+
 Mỗi hạt giống ghi `results/exp10_seed<s>.json` (số liệu), `exp10_trongso_seed<s>.pt`
 (trọng số cuối, `float64`) và `exp10_anh_seed<s>.npz` (ảnh chụp `float16` cho
 hoạt hình — không đưa vào git). Ảnh chụp `float16` chỉ dùng để vẽ `u`; mọi hình

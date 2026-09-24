@@ -25,14 +25,18 @@ hướng tiếp cận của báo cáo~\cite{karniadakis2021}.
 \emph{Thứ nhất, bài toán ngược.} Khi mục tiêu không chỉ là tìm nghiệm của một
 phương trình đã biết mà còn phải ước lượng tham số chưa biết, tính chất vật liệu,
 hoặc chính cơ chế vật lý còn thiếu, các phương pháp cổ điển đòi hỏi công thức hoá
-riêng, thuật toán mới và mã nguồn phức tạp. Chi phí thường ở mức không chấp nhận
+riêng, thuật toán mới và mã nguồn phức tạp. Chi phí có thể ở mức không chấp nhận
 được, vì mỗi bước lặp của bài toán ngược lại đòi hỏi giải trọn vẹn một bài toán
-thuận.
+thuận --- dù Mục~\ref{sec:tn11} sẽ cho thấy ở bài toán một chiều, nơi một lần giải
+thuận chỉ tốn chưa tới một giây, cái giá thật nằm ở công sức viết mã hơn là ở
+thời gian chạy.
  
 \emph{Thứ hai, điều kiện biên khuyết hoặc nhiễu.} Các phương pháp số cổ điển giả
 thiết điều kiện đầu và điều kiện biên được cho đầy đủ và chính xác. Trong nhiều
 hệ thực tế, các thông tin này bị thiếu, gián đoạn hoặc nhiễu; khi đó việc áp dụng
-trực tiếp các phương pháp truyền thống là bất khả thi.
+trực tiếp các phương pháp truyền thống là bất khả thi --- muốn dùng chúng, phải coi
+chính các điều kiện ấy là ẩn số của một bài toán tối ưu, như
+Mục~\ref{sec:tn11} làm.
  
 \emph{Thứ ba, lời nguyền số chiều.} Với các bài toán nhiều chiều, mọi phương pháp
 dựa trên lưới đều chịu chi phí tăng theo hàm mũ của số chiều. Đây là giới hạn có
@@ -211,9 +215,10 @@ nghiệm ở Mục~\ref{sec:hanche}.
  
 Để bảo đảm chiều sâu, báo cáo giới hạn phạm vi như sau.
  
-Về \emph{lớp bài toán}, trọng tâm đặt vào bài toán thuận; bài toán ngược chỉ được
+Về \emph{lớp bài toán}, trọng tâm đặt vào bài toán thuận; bài toán ngược được
 trình bày ở mức tổng quan (Mục~\ref{subsec:thuan-nguoc}) nhằm cho thấy tính thống
-nhất của khung phương pháp.
+nhất của khung phương pháp, và được thực nghiệm đúng một lần
+(Mục~\ref{sec:tn11}).
  
 Về \emph{cơ chế nhúng vật lý}, báo cáo tập trung vào thiên kiến học, tức cưỡng
 bức bằng phạt mềm; thiên kiến quy nạp chỉ được nhắc tới khi cần đối chiếu, qua
@@ -296,7 +301,7 @@ của chương là Bảng~\ref{tab:ba-nguyen-nhan}: ba nguyên nhân độc lậ
 khác nhau, cùng làm PINNs suy giảm trên đúng lớp bài toán có thang độ dài nhỏ.
  
 \textbf{Chương~\ref{chap:thucnghiem}} cài đặt toàn bộ khung ấy trên PyTorch và
-kiểm chứng bằng mười thí nghiệm, mỗi thí nghiệm trả lời một câu hỏi cụ thể với tiêu
+kiểm chứng bằng mười một thí nghiệm, mỗi thí nghiệm trả lời một câu hỏi cụ thể với tiêu
 chí thành công xác định trước. Kết quả được tổng hợp ở Bảng~\ref{tab:doi-chieu},
 và những hạn chế của chính thiết kế thực nghiệm được nêu thẳng ở
 Mục~\ref{sec:hanche}.

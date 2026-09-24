@@ -600,10 +600,10 @@ def anim_nguoc():
 
     a2 = fig.add_subplot(gs[1, 1])
     a2.set_yscale("log"); a2.set_xlim(0, b[-1] * 1.02)
-    a2.set_ylim(min(e2.min(), c1023) * 0.4, 1.5)
+    a2.set_ylim(min(e2.min(), c1023) * 0.3, 1.5)
     a2.axhline(c1023, color=CAM, lw=1.2, ls=(0, (4, 2)))
-    a2.text(b[-1], c1023 * 1.35, f"liên hợp rời rạc, Nx = 1023: {c1023:.2%}",
-            ha="right", fontsize=8, color=CHU)
+    a2.text(b[-1], c1023 * 0.72, f"liên hợp rời rạc, Nx = 1023 (trung vị): {c1023:.2%}",
+            ha="right", va="top", fontsize=8, color=CHU)
     a2.set_title(r"sai số tương đối của $\zeta_2$", loc="left")
     a2.set_xlabel("số lần đánh giá hàm mục tiêu")
     l2, = a2.plot([], [], color=PINN)
@@ -626,51 +626,69 @@ def anim_nguoc():
     g.dong(ms=90, giu_cuoi=26)
 
 
+def _on_dinh(q, tol=0.01):
+    """Thoi gian (giay) toi khi z2 o lai trong +-tol quanh gia tri cuoi."""
+    z = [d["z2"] for d in q["duong"]]; bb = [d["buoc"] for d in q["duong"]]
+    k = len(z) - 1
+    while k > 0 and abs(z[k - 1] - z[-1]) / z[-1] <= tol:
+        k -= 1
+    return bb[k] / q["so_danh_gia"] * q["giay"]
+
+
 def hinh_tn11():
     """Hinh 5.10: sai so z2 va thoi gian cua ba doi thu, tung hat giong."""
     A, CB = _tn11_doc()
-    nhom = [("PINN", None, None, PINN),
-            ("liên hợp\nNx = 1023", None, ("C", 1023), CAM),
-            ("liên hợp\nNx = 511", None, ("C", 511), CAM),
-            ("biết đầu/biên\nNx = 1023", None, ("B", 1023), THAM),
-            ("biết đầu/biên\nNx = 511", None, ("B", 511), THAM)]
+    nhom = [("PINN", None, PINN),
+            ("liên hợp\n1023", ("C", 1023), CAM),
+            ("liên hợp\n511", ("C", 511), CAM),
+            ("biết ĐK\n1023", ("B", 1023), THAM),
+            ("biết ĐK\n511", ("B", 511), THAM)]
 
-    def lay(i, sg, k):
-        ten, _, nguon, _ = nhom[i]
-        if ten == "PINN":
-            ds = [q for q in A if q["sigma"] == sg]
+    def ds(i, sg):
+        ten, nguon, _ = nhom[i]
+        if nguon is None:
+            d = [q for q in A if sg is None or q["sigma"] == sg]
         else:
-            ds = [q for q in CB if q["doi_thu"] == nguon[0] and q["Nx"] == nguon[1]
-                  and q["sigma"] == sg]
-        return [q[k] for q in sorted(ds, key=lambda q: q["seed"])]
+            d = [q for q in CB if q["doi_thu"] == nguon[0] and q["Nx"] == nguon[1]
+                 and (sg is None or q["sigma"] == sg)]
+        return sorted(d, key=lambda q: (q["sigma"], q["seed"]))
 
-    fig, axs = plt.subplots(1, 3, figsize=(10.2, 3.9))
-    fig.subplots_adjust(left=0.07, right=0.985, top=0.8, bottom=0.25, wspace=0.34)
-    muc = [(0.0, "sai_z2", r"(a) sai số $\zeta_2$, dữ liệu sạch"),
-           (0.01, "sai_z2", r"(b) sai số $\zeta_2$, nhiễu 1%"),
-           (None, "giay", "(c) thời gian mỗi lần chạy (giây)")]
-    for ax, (sg, k, tieu) in zip(axs, muc):
-        for i, (ten, _, _, mau) in enumerate(nhom):
-            if sg is None:
-                v = lay(i, 0.0, k) + lay(i, 0.01, k)
-            else:
-                v = lay(i, sg, k)
-            if not v:
-                continue
+    fig, axs = plt.subplots(1, 3, figsize=(10.4, 3.9))
+    fig.subplots_adjust(left=0.07, right=0.985, top=0.8, bottom=0.2, wspace=0.36)
+    for ax, sg, tieu in ((axs[0], 0.0, r"(a) sai số $\zeta_2$, dữ liệu sạch"),
+                         (axs[1], 0.01, r"(b) sai số $\zeta_2$, nhiễu 1%")):
+        for i, (ten, _, mau) in enumerate(nhom):
+            v = [q["sai_z2"] for q in ds(i, sg)]
             xj = i + np.linspace(-0.12, 0.12, len(v))
             ax.plot(xj, v, linestyle="none", color=mau, ms=6, mec=MAT, mew=1.2,
                     marker="o" if "511" not in ten else "s")
             ax.plot([i - 0.25, i + 0.25], [st.median(v)] * 2, color=CHU, lw=2)
         ax.set_yscale("log")
-        ax.set_xticks(range(len(nhom)))
-        ax.set_xticklabels([n[0] for n in nhom], fontsize=7.5, rotation=0)
-        ax.set_xlim(-0.5, len(nhom) - 0.5); ax.grid(axis="x", visible=False)
-        ax.set_title(tieu, loc="left")
-    for ax in axs[:2]:
         ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(
-            lambda v, _: f"{v:.1%}".replace(".", ",") if v >= 0.001 else f"{v:.2%}".replace(".", ",")))
-    fig.text(0.07, 0.93, "Cùng 2 000 điểm đo cho mọi đối thủ; mỗi chấm là một hạt giống, "
-             "vạch đen là trung vị. PINN và \"liên hợp\" không biết điều kiện đầu và biên.",
+            lambda v, _: (f"{v:.1%}" if v >= 0.001 else f"{v:.2%}").replace(".", ",")))
+        ax.set_title(tieu, loc="left")
+    ax = axs[2]
+    for i, (ten, _, mau) in enumerate(nhom):
+        d = ds(i, None)
+        xj = i + np.linspace(-0.2, 0.2, len(d))
+        for xx, q in zip(xj, d):
+            t1, t2 = _on_dinh(q), q["giay"]
+            ax.plot([xx, xx], [t1, t2], color=LUOI, lw=1, zorder=1)
+            ax.plot(xx, t2, linestyle="none", marker="o", ms=5, mfc=MAT, mec=mau, mew=1.2, zorder=2)
+            ax.plot(xx, t1, linestyle="none", marker="o", ms=5, color=mau, mec=MAT, mew=0.8, zorder=3)
+    ax.set_yscale("log")
+    ax.set_title("(c) thời gian mỗi lần chạy (giây)", loc="left")
+    ax.plot([], [], linestyle="none", marker="o", ms=5, color=CHU2, mec=MAT,
+            label=r"$\zeta_2$ đã ổn định ±1%")
+    ax.plot([], [], linestyle="none", marker="o", ms=5, mfc=MAT, mec=CHU2, mew=1.2,
+            label="dừng theo tiêu chí")
+    ax.legend(loc="lower left", fontsize=7.5, handletextpad=0.3)
+    for ax in axs:
+        ax.set_xticks(range(len(nhom)))
+        ax.set_xticklabels([n[0] for n in nhom], fontsize=7.8)
+        ax.set_xlim(-0.5, len(nhom) - 0.5); ax.grid(axis="x", visible=False)
+    fig.text(0.07, 0.93, "Mỗi chấm là một hạt giống, vạch đen là trung vị. PINN và \"liên hợp\" "
+             "không biết điều kiện đầu/biên; \"biết ĐK\" thì được cho đúng.",
              fontsize=8.5, color=CHU2)
     ra = os.path.join(GOC, "Images", "chap_5", "fig510_tn11.pdf")
     fig.savefig(ra); plt.close(fig)

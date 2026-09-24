@@ -553,8 +553,8 @@ và cộng sự~\cite{raissi2019} khảo sát.
 \paragraph{Bài toán thuận.}
 Tham số vật lý $\bzeta$ được cho trước; ẩn số duy nhất là $\btheta$. Bài toán tối
 ưu chính là \eqref{eq:opt-problem}. Toàn bộ thông tin giám sát nằm ở điều kiện
-đầu, điều kiện biên và phương trình. Đây là trường hợp của toàn bộ năm thí
-nghiệm ở Chương~\ref{chap:thucnghiem}.
+đầu, điều kiện biên và phương trình. Đây là trường hợp của TN1--TN10 ở
+Chương~\ref{chap:thucnghiem}.
  
 \paragraph{Bài toán ngược.}
 Tham số $\bzeta$ chưa biết và cần được xác định từ một tập quan trắc rời rạc
@@ -572,8 +572,13 @@ và ta tối ưu \emph{đồng thời} theo cặp $(\btheta, \bzeta)$. Điểm �
 $\bzeta$ được xử lý hoàn toàn giống một tham số của mạng: theo
 Định nghĩa~\ref{def:comp-graph}, nó là một đỉnh nguồn trong đồ thị tính toán và
 nhận gradient qua cùng cơ chế \eqref{eq:chain-graph}, không cần một thuật toán
-riêng. Đây là ưu thế nổi bật so với các phương pháp bài toán ngược cổ điển, vốn
-đòi hỏi giải lặp bài toán thuận nhiều lần.
+riêng. Phương pháp cổ điển thì cần đúng một thuật toán riêng: rời rạc hoá bài
+toán thuận, rồi suy ra và cài đặt bài toán liên hợp của nó để lấy gradient. Bản
+trước của báo cáo gọi điểm khác biệt này là ``ưu thế nổi bật''.
+Mục~\ref{sec:tn11} đặt hai cách làm cạnh nhau với cùng dữ liệu và thấy ưu thế ấy
+có thật nhưng hẹp hơn: nó nằm ở \emph{công sức xây dựng} phương pháp, còn về độ
+chính xác và thời gian chạy thì phương pháp liên hợp ngang ngửa, thậm chí nhanh
+hơn (Nhận xét~\ref{nx:doc-tn11}).
  
 \begin{vidu}[Phát hiện tham số của phương trình Burgers]
 \label{vd:burgers-inverse}
@@ -587,18 +592,22 @@ Xét phương trình Burgers dưới dạng tham số hoá
 với giá trị đúng $\zeta_{1} = 1$ và
 $\zeta_{2} = 0{,}01/\pi \approx 3{,}1831\times 10^{-3}$. Raissi và cộng
 sự~\cite{raissi2019} huấn luyện trên $N_u = 2000$ điểm quan trắc rải trong miền
-không gian--thời gian, với mạng $9$ lớp ẩn, $20$ nơ-ron mỗi lớp. Kết quả nhận
-dạng: với dữ liệu sạch, $\zeta_1 = 0{,}99915$ và
+không gian--thời gian, với mạng chín lớp --- tám lớp ẩn, $20$ nơ-ron mỗi lớp
+ẩn, theo đúng mã nguồn công bố kèm công trình. Kết quả nhận dạng: với dữ liệu sạch, $\zeta_1 = 0{,}99915$ và
 $\zeta_2 = 3{,}1794\times10^{-3}$, tức sai số tương đối $0{,}09\%$ và
 $0{,}12\%$; với dữ liệu nhiễu Gauss $1\%$, $\zeta_1 = 1{,}00042$ và
 $\zeta_2 = 3{,}2098\times10^{-3}$, tức $0{,}04\%$ và $0{,}84\%$.
  
 Hai kết luận, và một dè dặt. Kết luận thứ nhất: ràng buộc vật lý đóng vai trò
 chính quy hoá mạnh, giúp bài toán ngược vốn đặt không chỉnh trở nên ổn định.
-Kết luận thứ hai: sai số của $\zeta_2$ luôn lớn hơn sai số của $\zeta_1$ khoảng
-một bậc, và điều này không ngẫu nhiên -- $\zeta_2$ nhân với $\partial_{xx}u$, đại
+Kết luận thứ hai: sai số của $\zeta_2$ \emph{thường} lớn hơn sai số của
+$\zeta_1$, và điều này có lý do -- $\zeta_2$ nhân với $\partial_{xx}u$, đại
 lượng khó ước lượng nhất từ dữ liệu, đúng theo tinh thần
-Nhận xét~\ref{nx:fd-pde}. Dè dặt: các bảng khảo sát độ nhạy
+Nhận xét~\ref{nx:fd-pde}. Bản trước của báo cáo viết ``luôn lớn hơn khoảng một
+bậc''; Mục~\ref{sec:tn11} lặp thí nghiệm trên năm hạt giống và cho thấy điều ấy
+đúng về trung vị (tỉ số $24{,}5$) nhưng chỉ ở tám trên mười lần chạy --- và
+chính cặp số sạch ở trên, $0{,}09\%$ với $0{,}12\%$, vốn đã không ủng hộ chữ
+``luôn''. Dè dặt: các bảng khảo sát độ nhạy
 trong~\cite{raissi2019} cho thấy độ chính xác suy giảm nhanh khi mức nhiễu tăng
 lên $5\%$ hoặc $10\%$, và khi mạng quá nông; con số dưới $1\%$ ở trên đặc trưng
 cho cấu hình cụ thể vừa nêu, không phải cho phương pháp nói chung.

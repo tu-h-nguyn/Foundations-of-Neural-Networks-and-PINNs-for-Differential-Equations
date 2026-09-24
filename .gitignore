@@ -65,3 +65,4 @@ code/results/exp10_anh_seed*.npz
 
 # PDF bao cao bien dich ra (sinh lai bang latexmk)
 /main.pdf
+code/results/exp11_anh_*.npz
